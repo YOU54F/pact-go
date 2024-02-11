@@ -40,13 +40,17 @@ deps: download_plugins
 	go install github.com/mitchellh/gox@latest; \
 	cd -
 
+# avro plugin requires apk add bash and openjdk17-jre
+# go plugin linux-aarch64 version works on musl, requires musl named artifact
+# csv plugin requires a musl version creating
+# protobuf plugin requires apk add protobuf-dev protoc
 download_plugins:
 	@echo "--- 🐿  Installing plugins"; \
 	./scripts/install-cli.sh
-	~/.pact/bin/pact-plugin-cli -y install https://github.com/pactflow/pact-protobuf-plugin/releases/tag/v-0.3.8
-	~/.pact/bin/pact-plugin-cli -y install https://github.com/pact-foundation/pact-plugins/releases/tag/csv-plugin-0.0.1
-	~/.pact/bin/pact-plugin-cli -y install https://github.com/mefellows/pact-matt-plugin/releases/tag/v0.0.9
-	~/.pact/bin/pact-plugin-cli -y install https://github.com/austek/pact-avro-plugin/releases/tag/v0.0.3
+	~/.pact/bin/pact-plugin-cli -y install https://github.com/you54f/pact-protobuf-plugin/releases/tag/v-0.3.14
+	~/.pact/bin/pact-plugin-cli -y install https://github.com/you54f/pact-plugins/releases/tag/csv-plugin-0.0.6
+	~/.pact/bin/pact-plugin-cli -y install https://github.com/you54f/pact-matt-plugin/releases/tag/v0.1.0
+	~/.pact/bin/pact-plugin-cli -y install https://github.com/austek/pact-avro-plugin/releases/tag/v0.0.5
 
 cli:
 	@if [ ! -d pact/bin ]; then\
@@ -58,11 +62,10 @@ install: bin
 	echo "--- 🐿 Installing Pact FFI dependencies"
 	./build/pact-go	 -l DEBUG install --libDir /tmp
 
-pact: clean install docker
+pact:
 	@echo "--- 🔨 Running Pact examples"
-	go test -v -tags=consumer -count=1 github.com/pact-foundation/pact-go/v2/examples/...
-	make publish
-	go test -v -timeout=30s -tags=provider -count=1 github.com/pact-foundation/pact-go/v2/examples/...
+	go test -v -tags=consumer github.com/pact-foundation/pact-go/v2/examples/...
+	go test -v -timeout=30s -tags=provider github.com/pact-foundation/pact-go/v2/examples/...
 
 publish:
 	@echo "-- 📃 Publishing pacts"
