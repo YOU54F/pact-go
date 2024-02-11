@@ -75,7 +75,7 @@ func NewInstaller(opts ...installerConfig) (*Installer, error) {
 
 	// Only perform a check if current OS is linux
 	if runtime.GOOS == "linux" {
-		err := i.checkMusl()
+		err := checkMusl()
 		if err != nil {
 			log.Println("[DEBUG] unable to check for presence musl library due to error:", err)
 		}
@@ -253,7 +253,13 @@ func (i *Installer) getDownloadURLForPackage(pkg string) (string, error) {
 		return "", fmt.Errorf("unable to find package details for package: %s", pkg)
 	}
 
-	return fmt.Sprintf(downloadTemplate, pkg, pkgInfo.version, osToLibName[i.os], i.os, i.arch, osToExtension[i.os]), nil
+	if checkMusl() == nil && i.os == linux {
+		return fmt.Sprintf(downloadTemplate, pkg, pkgInfo.version, osToLibName[i.os], i.os, i.arch+"-musl", "a"), nil
+	} else {
+		return fmt.Sprintf(downloadTemplate, pkg, pkgInfo.version, osToLibName[i.os], i.os, i.arch, osToExtension[i.os]), nil
+
+	}
+
 }
 
 func (i *Installer) getLibDstForPackage(pkg string) (string, error) {
@@ -324,7 +330,7 @@ func checkVersion(lib, version, versionRange string) error {
 }
 
 // checkMusl checks if the OS uses musl library instead of glibc
-func (i *Installer) checkMusl() error {
+func checkMusl() error {
 	lddPath, err := exec.LookPath("ldd")
 	if err != nil {
 		return fmt.Errorf("could not find ldd in environment path")
@@ -351,8 +357,13 @@ var supportedOSes = map[string]string{
 
 var osToExtension = map[string]string{
 	windows: "dll",
-	linux:   "so",
-	osx:     "dylib",
+	linux: func() string {
+		if err := checkMusl(); err == nil {
+			return "a"
+		}
+		return "so"
+	}(),
+	osx: "dylib",
 }
 
 var osToLibName = map[string]string{
@@ -381,7 +392,7 @@ const (
 var packages = map[string]packageInfo{
 	FFIPackage: {
 		libName:     "libpact_ffi",
-		version:     "0.4.5",
+		version:     "0.4.15",
 		semverRange: ">= 0.4.0, < 1.0.0",
 	},
 }

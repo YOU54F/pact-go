@@ -26,7 +26,13 @@ func TestInstallerDownloader(t *testing.T) {
 			{
 				name: "ffi lib - linux x86",
 				pkg:  FFIPackage,
-				want: fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/libpact_ffi-v%s/libpact_ffi-linux-x86_64.so.gz", packages[FFIPackage].version),
+				want: func() string {
+					if checkMusl() == nil {
+						return fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/libpact_ffi-v%s/libpact_ffi-linux-x86_64-musl.a.gz", packages[FFIPackage].version)
+					} else {
+						return fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/libpact_ffi-v%s/libpact_ffi-linux-x86_64.so.gz", packages[FFIPackage].version)
+					}
+				}(),
 				test: Installer{
 					os:   linux,
 					arch: x86_64,
