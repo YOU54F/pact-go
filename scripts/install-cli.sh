@@ -15,8 +15,22 @@ detect_osarch() {
     # detect_musl
     case $(uname -sm) in
         'Linux x86_64')
-            os='linux'
-            arch='x86_64'
+            if ldd /bin/ls >/dev/null 2>&1; then
+                ldd_output=$(ldd /bin/ls)
+                case "$ldd_output" in
+                    *musl*) 
+                        os='linux'
+                        arch='x86_64-musl'
+                        ;;
+                    *) 
+                        os='linux'
+                        arch='x86_64'
+                        ;;
+                esac
+            else
+                os='linux'
+                arch='x86_64'
+            fi
             ;;
         'Linux aarch64')
             if ldd /bin/ls >/dev/null 2>&1; then
