@@ -28,10 +28,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"os"
 	"log"
 	"math"
 	"net"
+	"os"
 	"sync"
 	"time"
 
@@ -40,7 +40,7 @@ import (
 	"github.com/pact-foundation/pact-go/v2/examples/grpc/routeguide/data"
 	"google.golang.org/grpc/credentials"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	pb "github.com/pact-foundation/pact-go/v2/examples/grpc/routeguide"
 )

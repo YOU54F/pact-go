@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	l "log"
 	"os"
-	l"log"
 	"testing"
 	"time"
 
@@ -191,7 +191,7 @@ func TestGetPluginSyncMessageContentsAsBytes(t *testing.T) {
 	m := NewMessageServer("test-message-consumer", "test-message-provider")
 
 	// Protobuf plugin test
-	err := m.UsingPlugin("protobuf", "0.3.8")
+	err := m.UsingPlugin("protobuf", "0.3.14")
 	assert.NoError(t, err)
 
 	i := m.NewSyncMessageInteraction("grpc interaction")
@@ -248,7 +248,7 @@ func TestGetPluginAsyncMessageContentsAsBytes(t *testing.T) {
 	m := NewMessageServer("test-message-consumer", "test-message-provider")
 
 	// Protobuf plugin test
-	_ = m.UsingPlugin("protobuf", "0.3.8")
+	_ = m.UsingPlugin("protobuf", "0.3.14")
 
 	i := m.NewAsyncMessageInteraction("grpc interaction")
 
@@ -283,12 +283,12 @@ func TestGetPluginAsyncMessageContentsAsBytes(t *testing.T) {
 func TestGrpcPluginInteraction(t *testing.T) {
 	tmpPactFolder, err := os.MkdirTemp("", "pact-go")
 	assert.NoError(t, err)
-	_ = log.SetLogLevel("TRACE")
+	_ = log.SetLogLevel("INFO")
 
 	m := NewMessageServer("test-message-consumer", "test-message-provider")
 
 	// Protobuf plugin test
-	_ = m.UsingPlugin("protobuf", "0.3.8")
+	_ = m.UsingPlugin("protobuf", "0.3.14")
 
 	i := m.NewSyncMessageInteraction("grpc interaction")
 

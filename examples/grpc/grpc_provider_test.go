@@ -24,7 +24,7 @@ var dir, _ = os.Getwd()
 
 func TestGrpcProvider(t *testing.T) {
 	go startProvider()
-	l.SetLogLevel("TRACE")
+	l.SetLogLevel("INFO")
 
 	verifier := provider.NewVerifier()
 

@@ -16,7 +16,7 @@ func TestSyncTypeSystem(t *testing.T) {
 		Provider: "provider",
 		PactDir:  "/tmp/",
 	})
-	_ = log.SetLogLevel("TRACE")
+	_ = log.SetLogLevel("INFO")
 
 	dir, _ := os.Getwd()
 	path := fmt.Sprintf("%s/../../internal/native/pact_plugin.proto", dir)
@@ -87,7 +87,7 @@ func TestSyncTypeSystem(t *testing.T) {
 		Given("some state").
 		UsingPlugin(PluginConfig{
 			Plugin:  "csv",
-			Version: "0.0.1",
+			Version: "0.0.6",
 		}).
 		WithContents(csvInteraction, "text/csv").
 		ExecuteTest(t, func(m SynchronousMessage) error {
@@ -105,7 +105,7 @@ func TestSyncTypeSystem(t *testing.T) {
 		Given("some state").
 		UsingPlugin(PluginConfig{
 			Plugin:  "protobuf",
-			Version: "0.3.8",
+			Version: "0.3.14",
 		}).
 		WithContents(grpcInteraction, "application/protobuf").
 		StartTransport("grpc", "127.0.0.1", nil). // For plugin tests, we can't assume if a transport is needed, so this is optional
@@ -128,7 +128,7 @@ func TestSyncTypeSystem(t *testing.T) {
 		Given("some state").
 		UsingPlugin(PluginConfig{
 			Plugin:  "protobuf",
-			Version: "0.3.8",
+			Version: "0.3.14",
 		}).
 		WithContents(grpcInteraction, "application/protobuf").
 		StartTransport("grpc", "127.0.0.1", nil). // For plugin tests, we can't assume if a transport is needed, so this is optional

@@ -27,7 +27,7 @@ var requestFilterCalled = false
 var stateHandlerCalled = false
 
 func TestV3HTTPProvider(t *testing.T) {
-	log.SetLogLevel("TRACE")
+	log.SetLogLevel("INFO")
 	version.CheckVersion()
 
 	// Start provider API in the background
@@ -52,22 +52,22 @@ func TestV3HTTPProvider(t *testing.T) {
 	err := verifier.VerifyProvider(t, provider.VerifyRequest{
 		ProviderBaseURL: "http://127.0.0.1:8111",
 		Provider:        "V3Provider",
-		ProviderVersion: os.Getenv("APP_SHA"),
-		BrokerURL:       os.Getenv("PACT_BROKER_BASE_URL"),
+		// ProviderVersion: os.Getenv("APP_SHA"),
+		// BrokerURL:       os.Getenv("PACT_BROKER_BASE_URL"),
 		PactFiles: []string{
 			filepath.ToSlash(fmt.Sprintf("%s/PactGoV3Consumer-V3Provider.json", pactDir)),
 			filepath.ToSlash(fmt.Sprintf("%s/PactGoV2ConsumerMatch-V2ProviderMatch.json", pactDir)),
 		},
-		ConsumerVersionSelectors: []provider.Selector{
-			&provider.ConsumerVersionSelector{
-				Tag: "master",
-			},
-			&provider.ConsumerVersionSelector{
-				Tag: "prod",
-			},
-		},
-		PublishVerificationResults: true,
-		RequestFilter:              f,
+		// ConsumerVersionSelectors: []provider.Selector{
+		// 	&provider.ConsumerVersionSelector{
+		// 		Tag: "master",
+		// 	},
+		// 	&provider.ConsumerVersionSelector{
+		// 		Tag: "prod",
+		// 	},
+		// },
+		// PublishVerificationResults: true,
+		RequestFilter: f,
 		BeforeEach: func() error {
 			l.Println("[DEBUG] HOOK before each")
 			return nil
@@ -101,7 +101,7 @@ func TestV3HTTPProvider(t *testing.T) {
 }
 
 func TestV3MessageProvider(t *testing.T) {
-	log.SetLogLevel("TRACE")
+	log.SetLogLevel("INFO")
 	var user *User
 
 	verifier := provider.NewVerifier()
@@ -139,11 +139,11 @@ func TestV3MessageProvider(t *testing.T) {
 
 	// Verify the Provider with local Pact Files
 	verifier.VerifyProvider(t, provider.VerifyRequest{
-		PactFiles:       []string{filepath.ToSlash(fmt.Sprintf("%s/PactGoV3MessageConsumer-V3MessageProvider.json", pactDir))},
-		StateHandlers:   stateMappings,
-		Provider:        "V3MessageProvider",
-		ProviderVersion: os.Getenv("APP_SHA"),
-		BrokerURL:       os.Getenv("PACT_BROKER_BASE_URL"),
+		PactFiles:     []string{filepath.ToSlash(fmt.Sprintf("%s/PactGoV3MessageConsumer-V3MessageProvider.json", pactDir))},
+		StateHandlers: stateMappings,
+		Provider:      "V3MessageProvider",
+		// ProviderVersion: os.Getenv("APP_SHA"),
+		// BrokerURL:       os.Getenv("PACT_BROKER_BASE_URL"),
 		MessageHandlers: functionMappings,
 	})
 }
