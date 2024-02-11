@@ -1,12 +1,9 @@
-FROM golang:1.20.13
+FROM golang:alpine
 
-# Install pact ruby standalone binaries
-RUN curl -LO https://github.com/pact-foundation/pact-ruby-standalone/releases/download/v2.0.3/pact-2.0.3-linux-x86_64.tar.gz; \
-    tar -C /usr/local -xzf pact-2.0.3-linux-x86_64.tar.gz; \
-    rm pact-2.0.3-linux-x86_64.tar.gz
-
-ENV PATH /usr/local/pact/bin:$PATH
+RUN apk add --no-cache curl gcc musl-dev gzip openjdk17-jre bash protoc protobuf-dev make file
 
 COPY . /go/src/github.com/pact-foundation/pact-go
 
 WORKDIR /go/src/github.com/pact-foundation/pact-go
+
+CMD ["make", "test"]
