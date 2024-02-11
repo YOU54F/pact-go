@@ -47,6 +47,18 @@ jobs:
           name: logs-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}.zip
           path: ~/.pact/plugins/**/plugin.log
         if: ${{ always() }}
+  test_alpine:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build image
+        run: docker build . --progress plain -t pact-go-test:arm64-alpine
+      - name: Test Unit
+        run: docker run --rm -it -e PACT_DO_NOT_TRACK=true pact-go-test:arm64-alpine
+      - name: Test examples
+        run: docker run --rm -it -e PACT_DO_NOT_TRACK=true pact-go-test:arm64-alpine /bin/sh -c 'make test && make pact'
+
 
   finish:
     needs: test
