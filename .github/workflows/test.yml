@@ -53,11 +53,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Build image
-        run: docker build . --progress plain -t pact-go-test:arm64-alpine
+        run: docker build . --progress plain -t pact-go-test:amd64-alpine
       - name: Test Unit
-        run: docker run --rm -e PACT_DO_NOT_TRACK=true pact-go-test:arm64-alpine
+        run: docker run --rm -e PACT_DO_NOT_TRACK=true pact-go-test:amd64-alpine
+        if: always()
       - name: Test examples
-        run: docker run --rm -e PACT_DO_NOT_TRACK=true pact-go-test:arm64-alpine /bin/sh -c 'make test && make pact'
+        run: docker run --rm -e PACT_DO_NOT_TRACK=true pact-go-test:amd64-alpine /bin/sh -c 'make install && make download_plugins && make pact'
+        if: always()
+  test_alpine_arm64:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+      - name: Build image
+        run: docker build . --progress plain --platform=linux/arm64 -t pact-go-test:arm64-alpine
+      - name: Test Unit
+        run: docker run --platform=linux/arm64  --rm -e PACT_DO_NOT_TRACK=true pact-go-test:arm64-alpine
+        if: always()
+      - name: Test examples
+        run: docker run --platform=linux/arm64 --rm -e PACT_DO_NOT_TRACK=true pact-go-test:arm64-alpine /bin/sh -c 'make install && make download_plugins && make pact'
+        if: always()
 
 
   finish:
