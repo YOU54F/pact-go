@@ -6,6 +6,7 @@ DOCKER_HOST_HTTP?="http://host.docker.internal"
 PACT_CLI="docker run --rm -v ${PWD}:${PWD} -e PACT_BROKER_BASE_URL=$(DOCKER_HOST_HTTP) -e PACT_BROKER_USERNAME -e PACT_BROKER_PASSWORD pactfoundation/pact-cli"
 
 ci:: docker deps clean bin test pact
+ci_no_docker:: deps clean bin test pact
 
 # Run the ci target from a developer machine with the environment variables
 # set as if it was on Travis CI.
@@ -47,9 +48,6 @@ deps: download_plugins
 download_plugins:
 	@echo "--- 🐿  Installing plugins"; \
 	./scripts/install-cli.sh
-	~/.pact/bin/pact-plugin-cli -y install https://github.com/you54f/pact-protobuf-plugin/releases/tag/v-0.3.14
-	~/.pact/bin/pact-plugin-cli -y install https://github.com/you54f/pact-plugins/releases/tag/csv-plugin-0.0.6
-	~/.pact/bin/pact-plugin-cli -y install https://github.com/you54f/pact-matt-plugin/releases/tag/v0.1.0
 	~/.pact/bin/pact-plugin-cli -y install https://github.com/austek/pact-avro-plugin/releases/tag/v0.0.5
 
 cli:
@@ -64,8 +62,8 @@ install: bin
 
 pact:
 	@echo "--- 🔨 Running Pact examples"
-	go test -v -tags=consumer github.com/pact-foundation/pact-go/v2/examples/...
-	go test -v -timeout=30s -tags=provider github.com/pact-foundation/pact-go/v2/examples/...
+	go test -v -count=1 -tags=consumer github.com/pact-foundation/pact-go/v2/examples/...
+	go test -v -count=1 -timeout=30s -tags=provider github.com/pact-foundation/pact-go/v2/examples/...
 
 publish:
 	@echo "-- 📃 Publishing pacts"
@@ -81,7 +79,7 @@ test: deps install
 	@echo "mode: count" > coverage.txt
 	@for d in $$(go list ./... | grep -v vendor | grep -v examples); \
 		do \
-			go test -v -coverprofile=profile.out -covermode=atomic $$d; \
+			go test -count=1 -v -coverprofile=profile.out -covermode=atomic $$d; \
 			if [ $$? != 0 ]; then \
 				exit 1; \
 			fi; \

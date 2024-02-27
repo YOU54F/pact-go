@@ -339,8 +339,8 @@ func checkMusl() bool {
 	return false
 }
 
-// download template structure: "https://github.com/pact-foundation/pact-reference/releases/download/PACKAGE-vVERSION/LIBNAME-OS-ARCH.EXTENSION.gz"
-var downloadTemplate = "https://github.com/pact-foundation/pact-reference/releases/download/%s-v%s/%s-%s-%s.%s.gz"
+// download template structure: "https://github.com/you54f/pact-reference/releases/download/PACKAGE-vVERSION/LIBNAME-OS-ARCH.EXTENSION.gz"
+var downloadTemplate = "https://github.com/you54f/pact-reference/releases/download/%s-v%s/%s-%s-%s.%s.gz"
 
 var supportedOSes = map[string]string{
 	"darwin": osx,
@@ -385,7 +385,7 @@ const (
 var packages = map[string]packageInfo{
 	FFIPackage: {
 		libName:     "libpact_ffi",
-		version:     "0.4.15",
+		version:     "0.4.18",
 		semverRange: ">= 0.4.0, < 1.0.0",
 	},
 }
