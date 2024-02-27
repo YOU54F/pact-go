@@ -432,6 +432,7 @@ type V4InteractionWithPluginResponse struct {
 
 // ExecuteTest runs the current test case against a Mock Service.
 func (m *V4InteractionWithPluginResponse) ExecuteTest(t *testing.T, integrationTest func(MockServerConfig) error) error {
+	defer m.provider.mockserver.CleanupPlugins()
 	return m.provider.ExecuteTest(t, integrationTest)
 }
 
