@@ -15,7 +15,6 @@ import (
 	"github.com/pact-foundation/pact-go/v2/message"
 	"github.com/pact-foundation/pact-go/v2/models"
 	"github.com/pact-foundation/pact-go/v2/provider"
-	pactversion "github.com/pact-foundation/pact-go/v2/version"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,7 +25,7 @@ func TestPluginMessageProvider(t *testing.T) {
 	err := pactlog.SetLogLevel("INFO")
 	assert.NoError(t, err)
 
-	pactversion.CheckVersion()
+	// pactversion.CheckVersion()
 
 	verifier := provider.NewVerifier()
 

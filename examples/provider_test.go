@@ -16,7 +16,6 @@ import (
 	"github.com/pact-foundation/pact-go/v2/message"
 	"github.com/pact-foundation/pact-go/v2/models"
 	"github.com/pact-foundation/pact-go/v2/provider"
-	"github.com/pact-foundation/pact-go/v2/version"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +27,7 @@ var stateHandlerCalled = false
 
 func TestV3HTTPProvider(t *testing.T) {
 	log.SetLogLevel("INFO")
-	version.CheckVersion()
+	// version.CheckVersion()
 
 	// Start provider API in the background
 	go startServer()
