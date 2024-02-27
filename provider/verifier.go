@@ -360,8 +360,9 @@ func WaitForPort(port int, network string, address string, timeoutDuration time.
 			log.Printf("[ERROR] expected server to start < %s. %s", timeoutDuration, message)
 			return fmt.Errorf("expected server to start < %s. %s", timeoutDuration, message)
 		case <-time.After(50 * time.Millisecond):
-			_, err := net.Dial(network, fmt.Sprintf("%s:%d", address, port))
+			conn, err := net.Dial(network, fmt.Sprintf("%s:%d", address, port))
 			if err == nil {
+				conn.Close()
 				return nil
 			}
 		}
