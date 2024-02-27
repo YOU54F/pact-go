@@ -35,7 +35,7 @@ clean:
 	mkdir -p ./examples/pacts
 	rm -rf build output dist examples/pacts
 
-deps: download_plugins
+deps:
 	@echo "--- 🐿  Fetching build dependencies "
 	cd /tmp; \
 	go install github.com/mitchellh/gox@latest; \
@@ -45,10 +45,10 @@ deps: download_plugins
 # go plugin linux-aarch64 version works on musl, requires musl named artifact
 # csv plugin requires a musl version creating
 # protobuf plugin requires apk add protobuf-dev protoc
-download_plugins:
-	@echo "--- 🐿  Installing plugins"; \
-	./scripts/install-cli.sh
-	~/.pact/bin/pact-plugin-cli -y install https://github.com/austek/pact-avro-plugin/releases/tag/v0.0.5
+# download_plugins:
+# 	@echo "--- 🐿  Installing plugins"; \
+# 	./scripts/install-cli.sh
+# 	~/.pact/bin/pact-plugin-cli -y install https://github.com/austek/pact-avro-plugin/releases/tag/v0.0.5
 
 cli:
 	@if [ ! -d pact/bin ]; then\
