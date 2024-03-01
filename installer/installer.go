@@ -246,7 +246,7 @@ func (i *Installer) getDownloadURLForPackage(pkg string) (string, error) {
 	}
 
 	if checkMusl() && i.os == linux {
-		return fmt.Sprintf(downloadTemplate, pkg, pkgInfo.version, osToLibName[i.os], i.os, i.arch+"-musl", "a"), nil
+		return fmt.Sprintf(downloadTemplate, pkg, pkgInfo.version, osToLibName[i.os], i.os, i.arch+"-musl", osToExtension[i.os]), nil
 	} else {
 		return fmt.Sprintf(downloadTemplate, pkg, pkgInfo.version, osToLibName[i.os], i.os, i.arch, osToExtension[i.os]), nil
 
@@ -350,13 +350,8 @@ var supportedOSes = map[string]string{
 
 var osToExtension = map[string]string{
 	windows: "dll",
-	linux: func() string {
-		if checkMusl() {
-			return "a"
-		}
-		return "so"
-	}(),
-	osx: "dylib",
+	linux:   "so",
+	osx:     "dylib",
 }
 
 var osToLibName = map[string]string{
