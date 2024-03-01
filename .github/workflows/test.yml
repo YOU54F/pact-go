@@ -7,7 +7,7 @@ env:
   REACT_APP_API_BASE_URL: http://localhost:8080
   APP_SHA: ${{ github.sha }}
   APP_REF: ${{ github.ref }}
-  LD_LIBRARY_PATH: /tmp
+  PACT_LD_LIBRARY_PATH: /tmp
   PACT_GO_LIB_DOWNLOAD_PATH: /tmp
   LOG_LEVEL: info
   COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -25,7 +25,7 @@ jobs:
                     ]
         os: [
           ubuntu-latest,
-          # windows-latest,
+          windows-latest,
           macos-12, 
           macos-14
           ]
@@ -52,7 +52,8 @@ jobs:
         run: APP_BRANCH=${APP_REF:11} DOCKER_GATEWAY_HOST=172.17.0.1 DOCKER_HOST_HTTP="http://172.17.0.1" make
 
       - name: Unit Test 
-        if: runner.os == 'macOS'
+        if: runner.os != 'Linux'
+        # if: runner.os == 'macOS'
         run: make ci_no_docker
 
       # - name: Unit Test 
@@ -93,10 +94,10 @@ jobs:
       - name: Build image
         run: docker build . --progress plain -t pact-go-test:amd64-alpine
       - name: Test Unit
-        run: docker run --rm -e PACT_DO_NOT_TRACK=true pact-go-test:amd64-alpine
+        run: docker run --rm -e PACT_DO_NOT_TRACK=true -e PACT_LD_LIBRARY_PATH=$PACT_LD_LIBRARY_PATH -e PACT_GO_LIB_DOWNLOAD_PATH=$PACT_GO_LIB_DOWNLOAD_PATH pact-go-test:amd64-alpine
         if: always()
       - name: Test examples
-        run: docker run --rm -e PACT_DO_NOT_TRACK=true pact-go-test:amd64-alpine /bin/sh -c 'make install && make download_plugins && make pact'
+        run: docker run --rm -e PACT_DO_NOT_TRACK=true -e PACT_LD_LIBRARY_PATH=$PACT_LD_LIBRARY_PATH -e PACT_GO_LIB_DOWNLOAD_PATH=$PACT_GO_LIB_DOWNLOAD_PATH pact-go-test:amd64-alpine /bin/sh -c 'make install && make download_plugins && make pact'
         if: always()
   # test_alpine_arm64:
   #   runs-on: [ubuntu-latest]
