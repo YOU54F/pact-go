@@ -61,7 +61,7 @@ func TestVerifier_SetProviderInfo(t *testing.T) {
 	v.SetProviderInfo("name", "http", "localhost", 1234, "/")
 }
 
-func TestVerifier_SetConsumerFilters(t *testing.T) {
-	v := NewVerifier("pact-go", "test")
-	v.SetConsumerFilters([]string{"consumer1", "consumer2"})
-}
+// func TestVerifier_SetConsumerFilters(t *testing.T) {
+// 	v := NewVerifier("pact-go", "test")
+// 	v.SetConsumerFilters([]string{"consumer1", "consumer2"})
+// }

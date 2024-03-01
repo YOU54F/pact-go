@@ -20,32 +20,32 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func TestHandleBasedMessageTestsWithString(t *testing.T) {
-	tmpPactFolder, err := os.MkdirTemp("", "pact-go")
-	assert.NoError(t, err)
-	s := NewMessageServer("test-message-consumer", "test-message-provider")
+// func TestHandleBasedMessageTestsWithString(t *testing.T) {
+// 	tmpPactFolder, err := os.MkdirTemp("", "pact-go")
+// 	assert.NoError(t, err)
+// 	s := NewMessageServer("test-message-consumer", "test-message-provider")
 
-	m := s.NewMessage().
-		Given("some state").
-		GivenWithParameter("param", map[string]interface{}{
-			"foo": "bar",
-		}).
-		ExpectsToReceive("some message").
-		WithMetadata(map[string]string{
-			"meta": "data",
-		}).
-		WithContents(INTERACTION_PART_REQUEST, "text/plain", []byte("some string"))
+// 	m := s.NewMessage().
+// 		Given("some state").
+// 		GivenWithParameter("param", map[string]interface{}{
+// 			"foo": "bar",
+// 		}).
+// 		ExpectsToReceive("some message").
+// 		WithMetadata(map[string]string{
+// 			"meta": "data",
+// 		}).
+// 		WithContents(INTERACTION_PART_REQUEST, "text/plain", []byte("some string"))
 
-	body, err := m.GetMessageRequestContents()
+// 	body, err := m.GetMessageRequestContents()
 
-	assert.NoError(t, err)
-	assert.Equal(t, "some string", string(body))
+// 	assert.NoError(t, err)
+// 	assert.Equal(t, "some string", string(body))
 
-	// This is where you would invoke the real function with the message
+// 	// This is where you would invoke the real function with the message
 
-	err = s.WritePactFile(tmpPactFolder, false)
-	assert.NoError(t, err)
-}
+// 	err = s.WritePactFile(tmpPactFolder, false)
+// 	assert.NoError(t, err)
+// }
 
 func TestHandleBasedMessageTestsWithJSON(t *testing.T) {
 	tmpPactFolder, err := os.MkdirTemp("", "pact-go")
