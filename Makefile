@@ -81,13 +81,16 @@ test: deps install
 		do \
 			go test -count=1 -v -coverprofile=profile.out -covermode=atomic $$d; \
 			if [ $$? != 0 ]; then \
-				exit 1; \
+				export FAILURE=1; \
 			fi; \
 			if [ -f profile.out ]; then \
 					cat profile.out | tail -n +2 >> coverage.txt; \
 					rm profile.out; \
 			fi; \
 	done; \
+	if [ $$FAILURE -eq 1 ]; then \
+		exit 1; \
+	fi;
 	go tool cover -func coverage.txt
 
 
