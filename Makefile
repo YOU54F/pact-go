@@ -4,10 +4,14 @@ TEST?=./...
 .DEFAULT_GOAL := ci
 DOCKER_HOST_HTTP?="http://host.docker.internal"
 PACT_CLI="docker run --rm -v ${PWD}:${PWD} -e PACT_BROKER_BASE_URL=$(DOCKER_HOST_HTTP) -e PACT_BROKER_USERNAME -e PACT_BROKER_PASSWORD pactfoundation/pact-cli"
+# CGO_ENABLED?=0
+# PACT_LD_LIBRARY_PATH?=/tmp
 
 ifeq ($(OS),Windows_NT)
 	EXE=.exe
 	SKIP_AVRO=1
+else
+	SKIP_AVRO=0
 endif
 ci:: docker deps clean bin test pact
 ci_unit:: deps clean bin test
@@ -55,7 +59,7 @@ deps: download_plugins
 download_plugins:
 	@echo "--- 🐿  Installing plugins"; \
 	./scripts/install-cli.sh
-	if [ $${SKIP_AVRO:-0} -ne 1 ]; then \
+	if [ $(SKIP_AVRO) -ne 1 ]; then \
 		$$HOME/.pact/bin/pact-plugin-cli$(EXE) -y install https://github.com/austek/pact-avro-plugin/releases/tag/v0.0.5; \
 	fi
 cli:
@@ -70,8 +74,8 @@ install: bin
 
 pact:
 	@echo "--- 🔨 Running Pact examples"
-	go test -v -count=1 -tags=consumer github.com/pact-foundation/pact-go/v2/examples/...
-	go test -v -count=1 -timeout=30s -tags=provider github.com/pact-foundation/pact-go/v2/examples/...
+	CGO_ENABLED=0 go test -v -count=1 -tags=consumer github.com/pact-foundation/pact-go/v2/examples/...
+	CGO_ENABLED=0 go test -v -count=1 -timeout=30s -tags=provider github.com/pact-foundation/pact-go/v2/examples/...
 
 publish:
 	@echo "-- 📃 Publishing pacts"
@@ -87,7 +91,7 @@ test: deps install
 	@echo "mode: count" > coverage.txt
 	@for d in $$(go list ./... | grep -v vendor | grep -v examples); \
 		do \
-			go test -count=1 -v -coverprofile=profile.out -covermode=atomic $$d; \
+			CGO_ENABLED=0 go test -count=1 -v -coverprofile=profile.out -covermode=count $$d; \
 			if [ $$? != 0 ]; then \
 				export FAILURE=1; \
 			fi; \

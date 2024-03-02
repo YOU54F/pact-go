@@ -7,6 +7,7 @@ env:
   REACT_APP_API_BASE_URL: http://localhost:8080
   APP_SHA: ${{ github.sha }}
   APP_REF: ${{ github.ref }}
+  CGO_ENABLED: 0
   PACT_LD_LIBRARY_PATH: /tmp
   PACT_GO_LIB_DOWNLOAD_PATH: /tmp
   LOG_LEVEL: info
