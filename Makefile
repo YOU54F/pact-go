@@ -5,8 +5,14 @@ TEST?=./...
 DOCKER_HOST_HTTP?="http://host.docker.internal"
 PACT_CLI="docker run --rm -v ${PWD}:${PWD} -e PACT_BROKER_BASE_URL=$(DOCKER_HOST_HTTP) -e PACT_BROKER_USERNAME -e PACT_BROKER_PASSWORD pactfoundation/pact-cli"
 
+ifeq ($(OS),Windows_NT)
+	EXE=.exe
+endif
 ci:: docker deps clean bin test pact
-ci_no_docker:: deps clean bin test pact
+ci_unit:: deps clean bin test
+ci_pact:: docker pact
+ci_unit_no_docker:: deps clean bin test pact
+ci_pact_no_docker:: pact
 
 # Run the ci target from a developer machine with the environment variables
 # set as if it was on Travis CI.
@@ -48,7 +54,7 @@ deps: download_plugins
 download_plugins:
 	@echo "--- 🐿  Installing plugins"; \
 	./scripts/install-cli.sh
-	~/.pact/bin/pact-plugin-cli -y install https://github.com/austek/pact-avro-plugin/releases/tag/v0.0.5
+	~/.pact/bin/pact-plugin-cli$(EXE) -y install https://github.com/austek/pact-avro-plugin/releases/tag/v0.0.5
 
 cli:
 	@if [ ! -d pact/bin ]; then\
