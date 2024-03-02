@@ -91,7 +91,7 @@ test: deps install
 	@echo "mode: count" > coverage.txt
 	@for d in $$(go list ./... | grep -v vendor | grep -v examples); \
 		do \
-			CGO_ENABLED=0 go test -count=1 -v -coverprofile=profile.out -covermode=count $$d; \
+			CGO_ENABLED=0 go test -count=1 -v $$d; \
 			if [ $$? != 0 ]; then \
 				export FAILURE=1; \
 			fi; \
