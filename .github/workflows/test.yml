@@ -57,6 +57,9 @@ jobs:
       #   if: runner.os == 'Linux'
       #   run: APP_BRANCH=${APP_REF:11} DOCKER_GATEWAY_HOST=172.17.0.1 DOCKER_HOST_HTTP="http://172.17.0.1" make ci_pact
 
+      - if: runner.os == 'Windows'
+        run: rm 'C:\Windows\System32\bash.exe'
+
       - name: Unit Test 
         if: runner.os != 'Linux'
         run: make ci_unit_no_docker
