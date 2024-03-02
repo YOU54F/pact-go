@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"unsafe"
 
 	"github.com/ebitengine/purego"
 )
@@ -234,9 +235,9 @@ var pactffi_with_header_v2 func(uintptr, int32, string, int, string) bool
 var pactffi_set_header func(uint32, int32, string, string) bool
 var pactffi_response_status func(uintptr, uint16) bool
 var pactffi_response_status_v2 func(uintptr, string) bool
-var pactffi_with_body func(uintptr, int32, string, uintptr) bool
-var pactffi_with_binary_body func(uint32, int32, string, uintptr, size_t) bool
-var pactffi_with_binary_file func(uintptr, int32, string, uintptr, size_t) bool
+var pactffi_with_body func(uintptr, int32, string, string) bool
+var pactffi_with_binary_body func(uint32, int32, string, string, size_t) bool
+var pactffi_with_binary_file func(uintptr, int32, string, string, size_t) bool
 var pactffi_with_matching_rules func(uint32, int32, string) bool
 var pactffi_with_multipart_file_v2 func(uint32, int32, string, string, string, string) uintptr
 var pactffi_with_multipart_file func(uintptr, int32, string, string, string) uintptr
@@ -269,14 +270,14 @@ var pactffi_verifier_set_provider_state func(uintptr, string, uint8, uint8)
 var pactffi_verifier_set_verification_options func(uintptr, uint8, uint64) int32
 var pactffi_verifier_set_coloured_output func(uintptr, uint8) int32
 var pactffi_verifier_set_no_pacts_is_error func(uintptr, uint8) int32
-var pactffi_verifier_set_publish_options func(uintptr, string, string, uintptr, uint16, string) int32
-var pactffi_verifier_set_consumer_filters func(uintptr, uintptr, uint16)
+var pactffi_verifier_set_publish_options func(uintptr, string, string, []*byte, uint16, string) int32
+var pactffi_verifier_set_consumer_filters func(uintptr, []*byte, uint16)
 var pactffi_verifier_add_custom_header func(uintptr, string, string)
 var pactffi_verifier_add_file_source func(uintptr, string)
 var pactffi_verifier_add_directory_source func(uintptr, string)
 var pactffi_verifier_url_source func(uintptr, string, string, string, string)
 var pactffi_verifier_broker_source func(uintptr, string, string, string, string)
-var pactffi_verifier_broker_source_with_selectors func(uintptr, string, string, string, string, uint8, string, uintptr, uint16, string, uintptr, uint16, uintptr, uint16)
+var pactffi_verifier_broker_source_with_selectors func(uintptr, string, string, string, string, uint8, string, []*byte, uint16, string, []*byte, uint16, []*byte, uint16)
 var pactffi_verifier_execute func(uintptr) int32
 var pactffi_verifier_cli_args func() string
 var pactffi_verifier_logs func(uintptr) string
@@ -581,3 +582,18 @@ func init() {
 // 	pactffi_verifier_execute(verifier_handle)
 // 	pactffi_verifier_shutdown(verifier_handle)
 // }
+
+// hasSuffix tests whether the string s ends with suffix.
+func hasSuffix(s, suffix string) bool {
+	return len(s) >= len(suffix) && s[len(s)-len(suffix):] == suffix
+}
+
+// CString converts a go string to *byte that can be passed to C code.
+func CString(name string) *byte {
+	if hasSuffix(name, "\x00") {
+		return &(*(*[]byte)(unsafe.Pointer(&name)))[0]
+	}
+	b := make([]byte, len(name)+1)
+	copy(b, name)
+	return &b[0]
+}

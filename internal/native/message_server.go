@@ -235,7 +235,7 @@ func (m *Message) WithMetadata(valueOrMatcher map[string]string) *Message {
 func (m *Message) WithRequestBinaryContents(body []byte) *Message {
 
 	// TODO: handle response
-	res := pactffi_with_binary_file(m.handle, int32(INTERACTION_PART_REQUEST), "application/octet-stream", uintptr(unsafe.Pointer(&body[0])), size_t(len(body)))
+	res := pactffi_with_binary_file(m.handle, int32(INTERACTION_PART_REQUEST), "application/octet-stream", string(body), size_t(len(body)))
 
 	log.Println("[DEBUG] WithRequestBinaryContents - pactffi_with_binary_file returned", res)
 
@@ -244,7 +244,7 @@ func (m *Message) WithRequestBinaryContents(body []byte) *Message {
 func (m *Message) WithRequestBinaryContentType(contentType string, body []byte) *Message {
 
 	// TODO: handle response
-	res := pactffi_with_binary_file(m.handle, int32(INTERACTION_PART_REQUEST), contentType, uintptr(unsafe.Pointer(&body[0])), size_t(len(body)))
+	res := pactffi_with_binary_file(m.handle, int32(INTERACTION_PART_REQUEST), contentType, string(body), size_t(len(body)))
 
 	log.Println("[DEBUG] WithRequestBinaryContents - pactffi_with_binary_file returned", res)
 
@@ -262,7 +262,7 @@ func (m *Message) WithRequestJSONContents(body interface{}) *Message {
 func (m *Message) WithResponseBinaryContents(body []byte) *Message {
 
 	// TODO: handle response
-	pactffi_with_binary_file(m.handle, int32(INTERACTION_PART_RESPONSE), "application/octet-stream", uintptr(unsafe.Pointer(&body[0])), size_t(len(body)))
+	pactffi_with_binary_file(m.handle, int32(INTERACTION_PART_RESPONSE), "application/octet-stream", string(body), size_t(len(body)))
 
 	return m
 }
@@ -278,7 +278,7 @@ func (m *Message) WithResponseJSONContents(body interface{}) *Message {
 // Note that string values here must be NUL terminated.
 func (m *Message) WithContents(part interactionPart, contentType string, body []byte) *Message {
 
-	res := pactffi_with_body(m.handle, int32(part), contentType, uintptr(unsafe.Pointer(&body[0])))
+	res := pactffi_with_body(m.handle, int32(part), contentType, string(body))
 	log.Println("[DEBUG] response from pactffi_interaction_contents", (res == true))
 
 	return m

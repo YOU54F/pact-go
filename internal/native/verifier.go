@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"unsafe"
 )
 
 type Verifier struct {
@@ -88,8 +87,7 @@ func (v *Verifier) SetVerificationOptions(disableSSLVerification bool, requestTi
 }
 
 func (v *Verifier) SetConsumerFilters(consumers []string) {
-	// TODO: check if this actually works!
-	pactffi_verifier_set_consumer_filters(v.handle, stringArrayToCStringArray(consumers), uint16(len(consumers)))
+	pactffi_verifier_set_consumer_filters(v.handle, stringArrayToCByteArray(consumers), uint16(len(consumers)))
 }
 
 func (v *Verifier) AddCustomHeader(name string, value string) {
@@ -109,11 +107,11 @@ func (v *Verifier) AddURLSource(url string, username string, password string, to
 }
 
 func (v *Verifier) BrokerSourceWithSelectors(url string, username string, password string, token string, enablePending bool, includeWipPactsSince string, providerTags []string, providerBranch string, selectors []string, consumerVersionTags []string) {
-	pactffi_verifier_broker_source_with_selectors(v.handle, url, username, password, token, boolToCInt(enablePending), includeWipPactsSince, stringArrayToCStringArray(providerTags), uint16(len(providerTags)), providerBranch, stringArrayToCStringArray(selectors), uint16(len(selectors)), stringArrayToCStringArray(consumerVersionTags), uint16(len(consumerVersionTags)))
+	pactffi_verifier_broker_source_with_selectors(v.handle, url, username, password, token, boolToCInt(enablePending), includeWipPactsSince, stringArrayToCByteArray(providerTags), uint16(len(providerTags)), providerBranch, stringArrayToCByteArray(selectors), uint16(len(selectors)), stringArrayToCByteArray(consumerVersionTags), uint16(len(consumerVersionTags)))
 }
 
 func (v *Verifier) SetPublishOptions(providerVersion string, buildUrl string, providerTags []string, providerBranch string) {
-	pactffi_verifier_set_publish_options(v.handle, providerVersion, buildUrl, stringArrayToCStringArray(providerTags), uint16(len(providerTags)), providerBranch)
+	pactffi_verifier_set_publish_options(v.handle, providerVersion, buildUrl, stringArrayToCByteArray(providerTags), uint16(len(providerTags)), providerBranch)
 }
 
 func (v *Verifier) Execute() error {
@@ -144,18 +142,18 @@ func (v *Verifier) SetColoredOutput(isColoredOutput bool) {
 	pactffi_verifier_set_coloured_output(v.handle, boolToCInt(isColoredOutput))
 }
 
-func stringArrayToCStringArray(inputs []string) uintptr {
+func stringArrayToCByteArray(inputs []string) []*byte {
 	if len(inputs) == 0 {
-		return 0
+		return nil
 	}
 
-	output := make([]string, len(inputs))
+	output := make([]*byte, len(inputs))
 
 	for i, consumer := range inputs {
-		output[i] = consumer
+		output[i] = CString(consumer)
 	}
 
-	return (uintptr)(unsafe.Pointer(&output[0]))
+	return ([]*byte)(output)
 }
 
 func boolToCInt(val bool) uint8 {

@@ -94,7 +94,7 @@ test: deps install
 					rm profile.out; \
 			fi; \
 	done; \
-	if [ $$FAILURE -eq 1 ]; then \
+	if [ $${FAILURE:-0} -eq 1 ]; then \
 		exit 1; \
 	fi;
 	go tool cover -func coverage.txt

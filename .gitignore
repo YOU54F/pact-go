@@ -43,3 +43,6 @@ coverage.txt
 
 # Dependencies
 pact
+
+# pact files
+examples/pacts/*.json

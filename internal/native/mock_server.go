@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"unsafe"
 )
 
 type interactionPart int
@@ -510,7 +509,7 @@ func (i *Interaction) WithJSONResponseBody(body interface{}) *Interaction {
 func (i *Interaction) withJSONBody(body interface{}, part interactionPart) *Interaction {
 	jsonBody := stringFromInterface(body)
 
-	pactffi_with_body(i.handle, int32(part), "application/json", uintptr(unsafe.Pointer(&jsonBody)))
+	pactffi_with_body(i.handle, int32(part), "application/json", jsonBody)
 
 	return i
 }
@@ -525,14 +524,14 @@ func (i *Interaction) WithResponseBody(contentType string, body []byte) *Interac
 
 func (i *Interaction) withBody(contentType string, body []byte, part interactionPart) *Interaction {
 
-	pactffi_with_body(i.handle, int32(part), contentType, uintptr(unsafe.Pointer(&body[0])))
+	pactffi_with_body(i.handle, int32(part), contentType, string(body))
 
 	return i
 }
 
 func (i *Interaction) withBinaryBody(contentType string, body []byte, part interactionPart) *Interaction {
 
-	pactffi_with_binary_file(i.handle, int32(part), contentType, uintptr(unsafe.Pointer(&body[0])), size_t(len(body)))
+	pactffi_with_binary_file(i.handle, int32(part), contentType, string(body), size_t(len(body)))
 
 	return i
 }
