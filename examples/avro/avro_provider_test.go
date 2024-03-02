@@ -1,5 +1,5 @@
-//go:build provider
-// +build provider
+//go:build provider || darwin || linux
+// +build provider darwin linux
 
 package avro
 

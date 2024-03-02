@@ -1,5 +1,5 @@
-//go:build consumer
-// +build consumer
+//go:build consumer || darwin || linux
+// +build consumer darwin linux
 
 package avro
 

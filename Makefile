@@ -7,6 +7,7 @@ PACT_CLI="docker run --rm -v ${PWD}:${PWD} -e PACT_BROKER_BASE_URL=$(DOCKER_HOST
 
 ifeq ($(OS),Windows_NT)
 	EXE=.exe
+	SKIP_AVRO=1
 endif
 ci:: docker deps clean bin test pact
 ci_unit:: deps clean bin test
@@ -54,8 +55,9 @@ deps: download_plugins
 download_plugins:
 	@echo "--- 🐿  Installing plugins"; \
 	./scripts/install-cli.sh
-	$$HOME/.pact/bin/pact-plugin-cli$(EXE) -y install https://github.com/austek/pact-avro-plugin/releases/tag/v0.0.5
-
+	if [ $${SKIP_AVRO:-0} -ne 1 ]; then \
+		$$HOME/.pact/bin/pact-plugin-cli$(EXE) -y install https://github.com/austek/pact-avro-plugin/releases/tag/v0.0.5; \
+	fi
 cli:
 	@if [ ! -d pact/bin ]; then\
 		echo "--- 🐿 Installing Pact CLI dependencies"; \

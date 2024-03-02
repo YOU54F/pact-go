@@ -1,8 +1,9 @@
+//go:build darwin || linux
 package avro
 
 import (
-	
 	"os"
+
 	"github.com/linkedin/goavro/v2"
 )
 
