@@ -91,7 +91,7 @@ cli:
 
 install: bin
 	echo "--- 🐿 Installing Pact FFI dependencies"
-	./build/pact-go -l DEBUG install --libDir /tmp
+	./build/pact-go -l DEBUG install --libDir $$PWD
 
 pact: clean install
 	@echo "--- 🔨 Running Pact examples"
