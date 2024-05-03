@@ -19,16 +19,16 @@ jobs:
                     # 1.17.x, # Ended 02 Aug 2022
                     # 1.18.x, # Ended 01 Feb 2023
                     # 1.19.x, # Ended 8 Aug 2023
-                    '1.20', # Ended 06 Feb 2024
-                    '1.21',
+                    # '1.20', # Ended 06 Feb 2024
+                    # '1.21',
                     '1.22'
                     ]
         os: [
-          ubuntu-22.04,
-          ubuntu-latest,
-          # windows-latest,
-          macos-12,
-          macos-14
+          # ubuntu-22.04,
+          # ubuntu-latest,
+          windows-latest,
+          # macos-12,
+          # macos-14
           ]
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -46,11 +46,14 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      # - name: Set SKIP_PLUGIN_AVRO for Windows
-      #   if: matrix.os == 'windows-latest'
-      #   run: echo "SKIP_PLUGIN_AVRO=true" >> $GITHUB_ENV
-      #   shell: bash
-      #   # TODO - work out why plugin wont start on windows
+      - name: Set SKIP_PLUGIN_AVRO for Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "SKIP_PLUGIN_AVRO=true" >> $GITHUB_ENV
+          echo "PACT_GO_LIB_DOWNLOAD_PATH=$PWD" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$PWD" >> $GITHUB_ENV
+        shell: bash
+        # TODO - work out why plugin wont start on windows
 
       - run: brew install protobuf
         if: matrix.os == 'macos-14'
