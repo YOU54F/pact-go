@@ -69,6 +69,9 @@ jobs:
           - amd64 
           # - arm64
         go-version: ["1.20", "1.21", "1.22"]
+        variant:
+          - debian
+          - alpine
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
@@ -82,10 +85,10 @@ jobs:
           docker build \
             --platform ${{ matrix.arch }} \
             --build-arg VERSION=${{ matrix.go-version }} \
-            -f Dockerfile \
+            -f Dockerfile.${{ matrix.variant }} \
             -t pactfoundation/pact-go-test-${{ matrix.go-version }} .
 
-      - name: Test (unit) - ${{ matrix.arch }}
+      - name: Test - ${{ matrix.arch }}
         if: matrix.arch == 'amd64'
         run: |
           docker run \
@@ -93,7 +96,7 @@ jobs:
           -e LOG_LEVEL=${{ env.LOG_LEVEL }} \
           --rm pactfoundation/pact-go-test-${{ matrix.go-version }} /bin/sh -c 'make test && make pact_local'
 
-      - name: Test (unit) - ${{ matrix.arch }}
+      - name: Test - ${{ matrix.arch }}
         if: matrix.arch == 'arm64'
         run: |
           docker run \
