@@ -61,7 +61,7 @@ jobs:
 
   test-containers:
     runs-on: ubuntu-latest
-    name: ${{ matrix.arch }}-${{ matrix.go-version }}-test-container
+    name: ${{ matrix.variant }}-${{ matrix.arch }}-${{ matrix.go-version }}-test-container
     strategy:
       fail-fast: false
       matrix:
