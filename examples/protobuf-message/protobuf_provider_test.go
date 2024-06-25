@@ -30,8 +30,7 @@ func TestPluginMessageProvider(t *testing.T) {
 	err := pactlog.SetLogLevel(logutils.LogLevel(logLevel))
 
 	assert.NoError(t, err)
-	// i, _ := installer.NewInstaller()
-	// i.SetLibDir("/tmp")
+
 	pactversion.CheckVersion("/tmp")
 
 	verifier := provider.NewVerifier()
