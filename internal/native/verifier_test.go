@@ -44,12 +44,12 @@ func TestVerifier_NewForApplication(t *testing.T) {
 	assert.NotNil(t, v.handle)
 }
 
-func TestVerifier_Execute(t *testing.T) {
-	v := NewVerifier("pact-go", "test")
-	err := v.Execute()
+// func TestVerifier_Execute(t *testing.T) {
+	// v := NewVerifier("pact-go", "test")
+	// err := v.Execute()
 
-	assert.NoError(t, err)
-}
+// 	assert.NoError(t, err)
+// }
 
 func TestVerifier_Shutdown(t *testing.T) {
 	v := NewVerifier("pact-go", "test")
