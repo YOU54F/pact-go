@@ -11,6 +11,7 @@ import (
 	"os"
 	"testing"
 	"time"
+	"strings"
 
 	"github.com/hashicorp/logutils"
 	"github.com/pact-foundation/pact-go/v2/log"
@@ -218,7 +219,7 @@ func TestGetPluginSyncMessageContentsAsBytes(t *testing.T) {
 	i := m.NewSyncMessageInteraction("grpc interaction")
 
 	dir, _ := os.Getwd()
-	path := fmt.Sprintf("%s/pact_plugin.proto", dir)
+	path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
 
 	grpcInteraction := `{
 			"pact:proto": "` + path + `",
@@ -275,7 +276,7 @@ func TestGetPluginSyncMessageContentsAsBytes_EmptyResponse(t *testing.T) {
 	i := m.NewSyncMessageInteraction("grpc interaction")
 
 	dir, _ := os.Getwd()
-	path := fmt.Sprintf("%s/pact_plugin.proto", dir)
+	path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
 
 	grpcInteraction := `{
 			"pact:proto": "` + path + `",
@@ -320,7 +321,7 @@ func TestGetPluginAsyncMessageContentsAsBytes(t *testing.T) {
 	i := m.NewAsyncMessageInteraction("grpc interaction")
 
 	dir, _ := os.Getwd()
-	path := fmt.Sprintf("%s/pact_plugin.proto", dir)
+	path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
 
 	protobufInteraction := `{
 			"pact:proto": "` + path + `",
@@ -364,7 +365,7 @@ func TestGrpcPluginInteraction(t *testing.T) {
 	i := m.NewSyncMessageInteraction("grpc interaction")
 
 	dir, _ := os.Getwd()
-	path := fmt.Sprintf("%s/pact_plugin.proto", dir)
+	path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
 
 	grpcInteraction := `{
 			"pact:proto": "` + path + `",
@@ -445,7 +446,7 @@ func TestGrpcPluginInteraction_ErrorResponse(t *testing.T) {
 	i := m.NewSyncMessageInteraction("grpc interaction")
 
 	dir, _ := os.Getwd()
-	path := fmt.Sprintf("%s/pact_plugin.proto", dir)
+	path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
 
 	grpcInteraction := `{
 			"pact:proto": "` + path + `",

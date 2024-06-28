@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"strings"
 
 	"github.com/hashicorp/logutils"
 	"github.com/pact-foundation/pact-go/v2/log"
@@ -182,7 +183,7 @@ func TestPluginInteraction(t *testing.T) {
 	i := m.NewInteraction("some plugin interaction")
 
 	dir, _ := os.Getwd()
-	path := fmt.Sprintf("%s/pact_plugin.proto", dir)
+	path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
 
 	protobufInteraction := `{
 			"pact:proto": "` + path + `",
