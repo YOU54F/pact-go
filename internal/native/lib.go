@@ -9,3 +9,7 @@ package native
 #cgo linux,arm64 LDFLAGS: -L/tmp -L/opt/pact/lib -L/usr/local/lib -Wl,-rpath -Wl,/opt/pact/lib -Wl,-rpath -Wl,/tmp -Wl,-rpath -Wl,/usr/local/lib -lpact_ffi
 */
 import "C"
+
+// to load in windows with mingw64
+// $env:Path += ';$env:TMP'
+// $env:LDFLAGS = '-L$env:TMP'
