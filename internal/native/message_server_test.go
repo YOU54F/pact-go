@@ -9,9 +9,9 @@ import (
 	"io"
 	l "log"
 	"os"
+	"strings"
 	"testing"
 	"time"
-	"strings"
 
 	"github.com/hashicorp/logutils"
 	"github.com/pact-foundation/pact-go/v2/log"
@@ -214,6 +214,7 @@ func TestGetPluginSyncMessageContentsAsBytes(t *testing.T) {
 
 	// Protobuf plugin test
 	err := m.UsingPlugin("protobuf", "0.3.15")
+	defer m.CleanupPlugins()
 	assert.NoError(t, err)
 
 	i := m.NewSyncMessageInteraction("grpc interaction")
@@ -271,6 +272,7 @@ func TestGetPluginSyncMessageContentsAsBytes_EmptyResponse(t *testing.T) {
 
 	// Protobuf plugin test
 	err := m.UsingPlugin("protobuf", "0.3.15")
+	defer m.CleanupPlugins()
 	assert.NoError(t, err)
 
 	i := m.NewSyncMessageInteraction("grpc interaction")
@@ -317,6 +319,7 @@ func TestGetPluginAsyncMessageContentsAsBytes(t *testing.T) {
 
 	// Protobuf plugin test
 	_ = m.UsingPlugin("protobuf", "0.3.15")
+	defer m.CleanupPlugins()
 
 	i := m.NewAsyncMessageInteraction("grpc interaction")
 
@@ -361,6 +364,7 @@ func TestGrpcPluginInteraction(t *testing.T) {
 
 	// Protobuf plugin test
 	_ = m.UsingPlugin("protobuf", "0.3.15")
+	defer m.CleanupPlugins()
 
 	i := m.NewSyncMessageInteraction("grpc interaction")
 
@@ -472,6 +476,7 @@ func TestGrpcPluginInteraction_ErrorResponse(t *testing.T) {
 	port, err := m.StartTransport("grpc", "127.0.0.1", 0, make(map[string][]interface{}))
 	assert.NoError(t, err)
 	defer m.CleanupMockServer(port)
+	defer m.CleanupPlugins()
 
 	// Now we can make a normal gRPC request
 	initPluginRequest := &InitPluginRequest{

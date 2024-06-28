@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"testing"
 	"strings"
+	"testing"
 
 	"github.com/hashicorp/logutils"
 	"github.com/pact-foundation/pact-go/v2/log"
@@ -203,6 +203,7 @@ func TestPluginInteraction(t *testing.T) {
 	port, err := m.Start("0.0.0.0:0", false)
 	assert.NoError(t, err)
 	defer m.CleanupMockServer(port)
+	defer m.CleanupPlugins()
 
 	res, err := http.Get(fmt.Sprintf("http://0.0.0.0:%d/protobuf", port))
 	assert.NoError(t, err)

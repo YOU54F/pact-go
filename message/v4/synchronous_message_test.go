@@ -91,7 +91,7 @@ func TestSyncTypeSystem(t *testing.T) {
 		Given("some state").
 		UsingPlugin(PluginConfig{
 			Plugin:  "csv",
-			Version: "0.0.1",
+			Version: "0.0.6",
 		}).
 		WithContents(csvInteraction, "text/csv").
 		ExecuteTest(t, func(m SynchronousMessage) error {
