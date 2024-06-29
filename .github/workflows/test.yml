@@ -7,8 +7,8 @@ env:
   REACT_APP_API_BASE_URL: http://localhost:8080
   APP_SHA: ${{ github.sha }}
   APP_REF: ${{ github.ref }}
-  LD_LIBRARY_PATH: /tmp
-  PACT_GO_LIB_DOWNLOAD_PATH: /tmp
+  # LD_LIBRARY_PATH: /tmp
+  # PACT_GO_LIB_DOWNLOAD_PATH: /tmp
   LOG_LEVEL: DEBUG
   COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -148,6 +148,8 @@ jobs:
       - name: Add pact_ffi lib location to path
         run: |
            "$env:TMP" >> $env:GITHUB_PATH
+      - name: Install
+        run: make install
       - name: Test (unit)
         run: make test
       - name: Test (pact)
