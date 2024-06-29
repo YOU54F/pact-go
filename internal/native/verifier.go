@@ -63,6 +63,8 @@ static void install_signal_handlers()
     fix_signal(SIGXFSZ);
 #endif
 }
+#else
+	static void install_signal_handlers()
 #endif
 // Library headers
 #include <stdlib.h>
