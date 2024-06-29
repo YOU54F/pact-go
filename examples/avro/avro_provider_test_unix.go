@@ -1,4 +1,4 @@
-//go:build provider
+//go:build darwin || linux || provider
 // +build provider
 
 package avro
@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	"os"
 	"path/filepath"
 	"testing"

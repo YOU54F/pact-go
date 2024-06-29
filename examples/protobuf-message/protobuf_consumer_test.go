@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
+	"strings"
 	message "github.com/pact-foundation/pact-go/v2/message/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,7 +23,7 @@ func TestPluginMessageConsumer(t *testing.T) {
 	})
 
 	dir, _ := os.Getwd()
-	path := fmt.Sprintf("%s/../grpc/routeguide/route_guide.proto", dir)
+	path := fmt.Sprintf("%s/../grpc/routeguide/route_guide.proto", strings.ReplaceAll(dir, "\\", "/"))
 
 	protoMessage := `{
 		"pact:proto": "` + path + `",

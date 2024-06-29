@@ -1,4 +1,4 @@
-//go:build consumer
+//go:build darwin || linux || consumer
 // +build consumer
 
 package avro
@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"os"
 	"testing"
-
+	"strings"
 	"github.com/pact-foundation/pact-go/v2/consumer"
 
 	"path/filepath"
@@ -29,7 +29,7 @@ func TestAvroHTTP(t *testing.T) {
 	assert.NoError(t, err)
 
 	dir, _ := os.Getwd()
-	path := fmt.Sprintf("%s/user.avsc", dir)
+	path := fmt.Sprintf("%s/user.avsc", strings.ReplaceAll(dir, "\\", "/"))
 
 	avroResponse := `{
 		"pact:avro": "` + path + `",
