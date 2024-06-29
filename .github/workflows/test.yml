@@ -142,9 +142,11 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Set env flags
+      - name: Set LDFLAGS
         run: |
           "LDFLAGS=-L$env:TMP" >> $env:GITHUB_ENV
+      - name: Add pact_ffi lib location to path
+        run: |
            "$env:TMP" >> $env:GITHUB_PATH
       - name: Test (unit)
         run: make test
