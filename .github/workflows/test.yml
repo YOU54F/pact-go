@@ -120,17 +120,12 @@ jobs:
       fail-fast: false
       matrix:
         go-version: [ # https://endoflife.date/go
-                    1.17.x, # Ended 02 Aug 2022
-                    1.18.x, # Ended 01 Feb 2023
-                    1.19.x, # Ended 06 Sep 2023
                     1.20.x, # Ended 06 Feb 2024
                     1.21.x,
                     1.22.x,
                     ]
         os: [windows-latest]
     runs-on: ${{ matrix.os }}
-    env:
-      SKIP_PLUGIN_AVRO: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -138,25 +133,20 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go-version }}
-      - uses: actions/setup-java@v4 # Needed for the Avro example
-        with:
-          distribution: temurin
-          java-version: 17
-      - name: Set CGO_LDFLAGS
+      - name: Set CGO_LDFLAGS / pact_ffi lib on PATH, and skip Avro plugin download
         run: |
           "CGO_LDFLAGS=-L$env:TMP" >> $env:GITHUB_ENV
-      - name: Add pact_ffi lib location to path
-        run: |
           "$env:TMP" >> $env:GITHUB_PATH
-      - name: Build
-        run: .\scripts\build.ps1
-      - name: Test (unit)
-        run: .\scripts\unit.ps1
-      - name: Test (consumer)
-        run: .\scripts\examples_consumer.ps1
-      - name: Test (provider)
-        run: .\scripts\examples_provider.ps1
+          "SKIP_PLUGIN_AVRO=true" >> $env:GITHUB_ENV
+      # - name: Build
+      #   run: .\scripts\build.ps1
       # - name: Test (unit)
-      #   run: make test
-      # - name: Test (pact)
-      #   run: make pact_local
+      #   run: .\scripts\unit.ps1
+      # - name: Test (consumer)
+      #   run: .\scripts\examples_consumer.ps1
+      # - name: Test (provider)
+      #   run: .\scripts\examples_provider.ps1
+      - name: Test (unit)
+        run: make test
+      - name: Test (pact)
+        run: make pact_local

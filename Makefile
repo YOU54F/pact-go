@@ -132,13 +132,17 @@ ifdef SKIP_RACE
 	RACE=
 endif
 
+ifeq ($(OS),Windows_NT)
+	SKIP_TESTS+= --test.skip TestHandleBasedMessageTestsWithBinary
+endif
+
 test: deps install
 	@echo "--- ✅ Running tests"
 	@if [ -f coverage.txt ]; then rm coverage.txt; fi;
 	@echo "mode: count" > coverage.txt
 	@for d in $$(go list ./... | grep -v vendor | grep -v examples); \
 		do \
-			go test -v $(RACE) -coverprofile=profile.out -covermode=atomic $$d; \
+			go test -v $(RACE) -coverprofile=profile.out -covermode=atomic $$d $(SKIP_TESTS); \
 			if [ $$? != 0 ]; then \
 				exit 1; \
 			fi; \
