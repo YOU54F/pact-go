@@ -120,11 +120,11 @@ jobs:
       fail-fast: false
       matrix:
         go-version: [ # https://endoflife.date/go
-                    # 1.17.x, # Ended 02 Aug 2022
-                    # 1.18.x, # Ended 01 Feb 2023
-                    # 1.19.x, # Ended 06 Sep 2023
-                    # 1.20.x, # Ended 06 Feb 2024
-                    # 1.21.x,
+                    1.17.x, # Ended 02 Aug 2022
+                    1.18.x, # Ended 01 Feb 2023
+                    1.19.x, # Ended 06 Sep 2023
+                    1.20.x, # Ended 06 Feb 2024
+                    1.21.x,
                     1.22.x,
                     ]
         os: [windows-latest]
