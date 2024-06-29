@@ -1,6 +1,7 @@
 package native
 
 /*
+#if defined(__APPLE__) || defined(__linux__)
 // https://github.com/wailsapp/wails/pull/2152/files#diff-d4a0fa73df7b0ab971e550f95249e358b634836e925ace96f7400480916ac09e
 #include <errno.h>
 #include <signal.h>
@@ -62,6 +63,7 @@ static void install_signal_handlers()
     fix_signal(SIGXFSZ);
 #endif
 }
+#endif
 // Library headers
 #include <stdlib.h>
 #include <stdint.h>
@@ -163,6 +165,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"runtime"
 	"unsafe"
 )
 
@@ -392,8 +395,9 @@ func (m *MessageServer) UsingPlugin(pluginName string, pluginVersion string) err
 	defer free(cPluginVersion)
 
 	r := C.pactffi_using_plugin(m.messagePact.handle, cPluginName, cPluginVersion)
-	C.install_signal_handlers()
-
+	if runtime.GOOS != "windows" {
+		C.install_signal_handlers()
+	}
 	// 1 - A general panic was caught.
 	// 2 - Failed to load the plugin.
 	// 3 - Pact Handle is not valid.
