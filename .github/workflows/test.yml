@@ -144,7 +144,7 @@ jobs:
           java-version: 17
       - name: Set CGO_LDFLAGS
         run: |
-          "CGO_LDFLAGS=$env:TMP" >> $env:GITHUB_ENV
+          "CGO_LDFLAGS=-L$env:TMP" >> $env:GITHUB_ENV
       - name: Add pact_ffi lib location to path
         run: |
           "$env:TMP" >> $env:GITHUB_PATH
