@@ -56,8 +56,10 @@ jobs:
         if: matrix.os != 'ubuntu-latest'
         run: make pact_local
       - name: Install goveralls
+        if: matrix.os != 'windows-latest'
         run: go install github.com/mattn/goveralls@latest
       - name: Send coverage
+        if: matrix.os != 'windows-latest'
         run: goveralls -coverprofile=coverage.txt -service=github -parallel
       - uses: actions/upload-artifact@v4
         with:
