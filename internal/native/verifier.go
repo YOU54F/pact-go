@@ -65,6 +65,8 @@ static void install_signal_handlers()
 }
 #else
 	static void install_signal_handlers()
+	{
+	}
 #endif
 // Library headers
 #include <stdlib.h>
