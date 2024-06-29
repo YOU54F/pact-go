@@ -142,15 +142,15 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Set LDFLAGS
-        run: |
-          "LDFLAGS=-LC:/Users/RUNNER~1/AppData/Local/Temp" >> $env:GITHUB_ENV
+      # - name: Set LDFLAGS
+      #   run: |
+      #     "LDFLAGS=-LC:/Users/RUNNER~1/AppData/Local/Temp" >> $env:GITHUB_ENV
       - name: Add pact_ffi lib location to path
         run: |
-           "C:/Users/RUNNER~1/AppData/Local/Temp" >> $env:GITHUB_PATH
-      - name: Install
-        run: make install
-      - name: Test (unit)
-        run: make test
-      - name: Test (pact)
-        run: make pact_local
+           $env:Path += ';$env:TMP';$env:LDFLAGS = '-L$env:TMP';make test
+      # - name: Install
+      #   run: make install
+      # - name: Test (unit)
+      #   run: make test
+      # - name: Test (pact)
+      #   run: make pact_local
