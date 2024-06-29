@@ -110,7 +110,7 @@ cli:
 
 install: bin
 	echo "--- 🐿 Installing Pact FFI dependencies"
-	# ./build/pact-go -l DEBUG install --libDir /tmp
+	./build/pact-go -l DEBUG install --libDir /tmp
 
 pact: clean install docker
 	@echo "--- 🔨 Running Pact examples"
