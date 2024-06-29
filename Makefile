@@ -49,6 +49,14 @@ docker_pact: docker_build
 		-it \
 		pactfoundation/pact-go-test-$(IMAGE_VARIANT) \
 		/bin/sh -c "make pact_local"
+docker_shell: docker_build
+	docker run \
+		-e LOG_LEVEL=INFO \
+		-v $$PWD:/go/src/github.com/pact-foundation/pact-go \
+		--rm \
+		-it \
+		pactfoundation/pact-go-test-$(IMAGE_VARIANT) \
+		/bin/sh
 bin:
 	go build -o build/pact-go
 
@@ -102,7 +110,7 @@ cli:
 
 install: bin
 	echo "--- 🐿 Installing Pact FFI dependencies"
-	./build/pact-go -l DEBUG install --libDir /tmp
+	# ./build/pact-go -l DEBUG install --libDir /tmp
 
 pact: clean install docker
 	@echo "--- 🔨 Running Pact examples"
