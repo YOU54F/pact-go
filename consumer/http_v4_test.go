@@ -3,13 +3,21 @@ package consumer
 import (
 	"fmt"
 	"os"
-	"testing"
 	"strings"
+	"testing"
+
+	"github.com/hashicorp/logutils"
+	"github.com/pact-foundation/pact-go/v2/log"
 	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHttpV4TypeSystem(t *testing.T) {
+	logLevel := os.Getenv("LOG_LEVEL")
+	if logLevel == "" {
+		logLevel = "TRACE"
+	}
+	_ = log.SetLogLevel(logutils.LogLevel(logLevel))
 
 	p, err := NewV4Pact(MockHTTPProviderConfig{
 		Consumer: "consumer",
