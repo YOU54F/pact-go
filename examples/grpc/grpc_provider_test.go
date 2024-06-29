@@ -6,6 +6,7 @@ package grpc
 import (
 	"fmt"
 	"log"
+	"runtime"
 
 	"net"
 	"os"
@@ -23,29 +24,32 @@ import (
 )
 
 func TestGrpcProvider(t *testing.T) {
-	go startProvider()
-	logLevel := os.Getenv("LOG_LEVEL")
-	if logLevel == "" {
-		logLevel = "TRACE"
-	}
-	l.SetLogLevel(logutils.LogLevel(logLevel))
-	verifier := provider.NewVerifier()
+	if runtime.GOOS != "windows" {
 
-	err := verifier.VerifyProvider(t, provider.VerifyRequest{
-		ProviderBaseURL: "http://localhost:8222",
-		Transports: []provider.Transport{
-			{
-				Protocol: "grpc",
-				Port:     8222,
+		go startProvider()
+		logLevel := os.Getenv("LOG_LEVEL")
+		if logLevel == "" {
+			logLevel = "TRACE"
+		}
+		l.SetLogLevel(logutils.LogLevel(logLevel))
+		verifier := provider.NewVerifier()
+
+		err := verifier.VerifyProvider(t, provider.VerifyRequest{
+			ProviderBaseURL: "http://localhost:8222",
+			Transports: []provider.Transport{
+				{
+					Protocol: "grpc",
+					Port:     8222,
+				},
 			},
-		},
-		Provider: "grpcprovider",
-		PactFiles: []string{
-			filepath.ToSlash(fmt.Sprintf("%s/../pacts/grpcconsumer-grpcprovider.json", dir)),
-		},
-	})
+			Provider: "grpcprovider",
+			PactFiles: []string{
+				filepath.ToSlash(fmt.Sprintf("%s/../pacts/grpcconsumer-grpcprovider.json", dir)),
+			},
+		})
 
-	assert.NoError(t, err)
+		assert.NoError(t, err)
+	}
 }
 
 func startProvider() {

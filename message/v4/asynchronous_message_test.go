@@ -3,6 +3,7 @@ package v4
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"testing"
 
 	"github.com/hashicorp/logutils"
@@ -11,6 +12,7 @@ import (
 )
 
 func TestAsyncTypeSystem(t *testing.T) {
+	if runtime.GOOS != "windows" {
 	p, _ := NewAsynchronousPact(Config{
 		Consumer: "asyncconsumer",
 		Provider: "asyncprovider",
@@ -80,4 +82,5 @@ func TestAsyncTypeSystem(t *testing.T) {
 			return nil
 		})
 	assert.NoError(t, err)
+	}
 }

@@ -65,10 +65,6 @@ clean:
 	rm -rf build output dist examples/pacts
 
 deps: download_plugins
-	@echo "--- 🐿  Fetching build dependencies "
-	cd /tmp; \
-	go install github.com/mitchellh/gox@latest; \
-	cd -
 
 download_plugins:
 	@echo "--- 🐿  Installing plugins"; \

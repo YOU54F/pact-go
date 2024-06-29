@@ -148,9 +148,15 @@ jobs:
       - name: Add pact_ffi lib location to path
         run: |
           "$env:TMP" >> $env:GITHUB_PATH
-      # - name: Install
-      #   run: make install
+      - name: Build
+        run: .\scripts\build.ps1
       - name: Test (unit)
-        run: make test
-      - name: Test (pact)
-        run: make pact_local
+        run: .\scripts\unit.ps1
+      - name: Test (consumer)
+        run: .\scripts\examples_consumer.ps1
+      - name: Test (provider)
+        run: .\scripts\examples_provider.ps1
+      # - name: Test (unit)
+      #   run: make test
+      # - name: Test (pact)
+      #   run: make pact_local

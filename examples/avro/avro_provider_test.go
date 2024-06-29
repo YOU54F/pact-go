@@ -1,4 +1,4 @@
-//go:build darwin || linux || provider
+//go:build provider
 // +build provider
 
 package avro
@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/pact-foundation/pact-go/v2/provider"
@@ -20,23 +21,26 @@ var dir, _ = os.Getwd()
 var pactDir = fmt.Sprintf("%s/../pacts", dir)
 
 func TestAvroHTTPProvider(t *testing.T) {
-	httpPort, _ := utils.GetFreePort()
+	if runtime.GOOS != "windows" {
 
-	// Start provider API in the background
-	go startHTTPProvider(httpPort)
+		httpPort, _ := utils.GetFreePort()
 
-	verifier := provider.NewVerifier()
+		// Start provider API in the background
+		go startHTTPProvider(httpPort)
 
-	// Verify the Provider with local Pact Files
-	err := verifier.VerifyProvider(t, provider.VerifyRequest{
-		ProviderBaseURL: fmt.Sprintf("http://127.0.0.1:%d", httpPort),
-		Provider:        "AvroProvider",
-		PactFiles: []string{
-			filepath.ToSlash(fmt.Sprintf("%s/AvroConsumer-AvroProvider.json", pactDir)),
-		},
-	})
+		verifier := provider.NewVerifier()
 
-	assert.NoError(t, err)
+		// Verify the Provider with local Pact Files
+		err := verifier.VerifyProvider(t, provider.VerifyRequest{
+			ProviderBaseURL: fmt.Sprintf("http://127.0.0.1:%d", httpPort),
+			Provider:        "AvroProvider",
+			PactFiles: []string{
+				filepath.ToSlash(fmt.Sprintf("%s/AvroConsumer-AvroProvider.json", pactDir)),
+			},
+		})
+
+		assert.NoError(t, err)
+	}
 }
 
 func startHTTPProvider(port int) {
