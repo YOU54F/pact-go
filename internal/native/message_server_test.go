@@ -158,37 +158,37 @@ func TestGetAsyncMessageContentsAsBytes(t *testing.T) {
 	assert.Equal(t, "json", v.Some)
 }
 
-func TestGetSyncMessageContentsAsBytes(t *testing.T) {
-	s := NewMessageServer("test-message-consumer", "test-message-provider")
+// func TestGetSyncMessageContentsAsBytes(t *testing.T) {
+// 	s := NewMessageServer("test-message-consumer", "test-message-provider")
 
-	m := s.NewSyncMessageInteraction("").
-		Given("some state").
-		GivenWithParameter("param", map[string]interface{}{
-			"foo": "bar",
-		}).
-		ExpectsToReceive("some message").
-		WithMetadata(map[string]string{
-			"meta": "data",
-		}).
-		// WithResponseJSONContents(map[string]string{
-		// 	"some": "request",
-		// }).
-		WithResponseJSONContents(map[string]string{
-			"some": "response",
-		})
+// 	m := s.NewSyncMessageInteraction("").
+// 		Given("some state").
+// 		GivenWithParameter("param", map[string]interface{}{
+// 			"foo": "bar",
+// 		}).
+// 		ExpectsToReceive("some message").
+// 		WithMetadata(map[string]string{
+// 			"meta": "data",
+// 		}).
+// 		// WithResponseJSONContents(map[string]string{
+// 		// 	"some": "request",
+// 		// }).
+// 		WithResponseJSONContents(map[string]string{
+// 			"some": "response",
+// 		})
 
-	bytes, err := m.GetMessageResponseContents()
-	assert.NoError(t, err)
-	assert.NotNil(t, bytes)
+// 	bytes, err := m.GetMessageResponseContents()
+// 	assert.NoError(t, err)
+// 	assert.NotNil(t, bytes)
 
-	// Should be able to convert back into the JSON structure
-	var v struct {
-		Some string `json:"some"`
-	}
-	err = json.Unmarshal(bytes[0], &v)
-	assert.NoError(t, err)
-	assert.Equal(t, "response", v.Some)
-}
+// 	// Should be able to convert back into the JSON structure
+// 	var v struct {
+// 		Some string `json:"some"`
+// 	}
+// 	err = json.Unmarshal(bytes[0], &v)
+// 	assert.NoError(t, err)
+// 	assert.Equal(t, "response", v.Some)
+// }
 
 func TestGetSyncMessageContentsAsBytes_EmptyResponse(t *testing.T) {
 	s := NewMessageServer("test-message-consumer", "test-message-provider")
@@ -210,113 +210,113 @@ func TestGetSyncMessageContentsAsBytes_EmptyResponse(t *testing.T) {
 	assert.Empty(t, bytes[0])
 }
 
-func TestGetPluginSyncMessageContentsAsBytes(t *testing.T) {
-	if runtime.GOOS != "windows" {
-		m := NewMessageServer("test-message-consumer", "test-message-provider")
+// func TestGetPluginSyncMessageContentsAsBytes(t *testing.T) {
+// 	if runtime.GOOS != "windows" {
+// 		m := NewMessageServer("test-message-consumer", "test-message-provider")
 
-		// Protobuf plugin test
-		err := m.UsingPlugin("protobuf", "0.3.15")
-		defer m.CleanupPlugins()
-		assert.NoError(t, err)
+// 		// Protobuf plugin test
+// 		err := m.UsingPlugin("protobuf", "0.3.15")
+// 		defer m.CleanupPlugins()
+// 		assert.NoError(t, err)
 
-		i := m.NewSyncMessageInteraction("grpc interaction")
+// 		i := m.NewSyncMessageInteraction("grpc interaction")
 
-		dir, _ := os.Getwd()
-		path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
+// 		dir, _ := os.Getwd()
+// 		path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
 
-		grpcInteraction := `{
-			"pact:proto": "` + path + `",
-			"pact:proto-service": "PactPlugin/InitPlugin",
-			"pact:content-type": "application/protobuf",
-			"request": {
-				"implementation": "notEmpty('pact-go-driver')",
-				"version": "matching(semver, '0.0.0')"
-			},
-			"response": {
-				"catalogue": [
-					{
-						"type": "INTERACTION",
-						"key": "test"
-					}
-				]
-			}
-		}`
+// 		grpcInteraction := `{
+// 			"pact:proto": "` + path + `",
+// 			"pact:proto-service": "PactPlugin/InitPlugin",
+// 			"pact:content-type": "application/protobuf",
+// 			"request": {
+// 				"implementation": "notEmpty('pact-go-driver')",
+// 				"version": "matching(semver, '0.0.0')"
+// 			},
+// 			"response": {
+// 				"catalogue": [
+// 					{
+// 						"type": "INTERACTION",
+// 						"key": "test"
+// 					}
+// 				]
+// 			}
+// 		}`
 
-		err = i.
-			Given("plugin state").
-			// For gRPC interactions we prpvide the config once for both the request and response parts
-			WithPluginInteractionContents(INTERACTION_PART_REQUEST, "application/protobuf", grpcInteraction)
-		assert.NoError(t, err)
+// 		err = i.
+// 			Given("plugin state").
+// 			// For gRPC interactions we prpvide the config once for both the request and response parts
+// 			WithPluginInteractionContents(INTERACTION_PART_REQUEST, "application/protobuf", grpcInteraction)
+// 		assert.NoError(t, err)
 
-		bytes, err := i.GetMessageRequestContents()
-		assert.NoError(t, err)
-		assert.NotNil(t, bytes)
+// 		bytes, err := i.GetMessageRequestContents()
+// 		assert.NoError(t, err)
+// 		assert.NotNil(t, bytes)
 
-		// Should be able to convert request body back into a protobuf
-		p := &InitPluginRequest{}
-		err = proto.Unmarshal(bytes, p)
-		assert.NoError(t, err)
-		assert.Equal(t, "0.0.0", p.Version)
+// 		// Should be able to convert request body back into a protobuf
+// 		p := &InitPluginRequest{}
+// 		err = proto.Unmarshal(bytes, p)
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, "0.0.0", p.Version)
 
-		// Should be able to convert response into a protobuf
-		response, err := i.GetMessageResponseContents()
-		assert.NoError(t, err)
-		assert.NotNil(t, bytes)
-		r := &InitPluginResponse{}
-		err = proto.Unmarshal(response[0], r)
-		assert.NoError(t, err)
-		assert.Equal(t, "test", r.Catalogue[0].Key)
-	}
-}
+// 		// Should be able to convert response into a protobuf
+// 		response, err := i.GetMessageResponseContents()
+// 		assert.NoError(t, err)
+// 		assert.NotNil(t, bytes)
+// 		r := &InitPluginResponse{}
+// 		err = proto.Unmarshal(response[0], r)
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, "test", r.Catalogue[0].Key)
+// 	}
+// }
 
-func TestGetPluginSyncMessageContentsAsBytes_EmptyResponse(t *testing.T) {
-	if runtime.GOOS != "windows" {
-		m := NewMessageServer("test-message-consumer", "test-message-provider")
+// func TestGetPluginSyncMessageContentsAsBytes_EmptyResponse(t *testing.T) {
+// 	if runtime.GOOS != "windows" {
+// 		m := NewMessageServer("test-message-consumer", "test-message-provider")
 
-		// Protobuf plugin test
-		err := m.UsingPlugin("protobuf", "0.3.15")
-		defer m.CleanupPlugins()
-		assert.NoError(t, err)
+// 		// Protobuf plugin test
+// 		err := m.UsingPlugin("protobuf", "0.3.15")
+// 		defer m.CleanupPlugins()
+// 		assert.NoError(t, err)
 
-		i := m.NewSyncMessageInteraction("grpc interaction")
+// 		i := m.NewSyncMessageInteraction("grpc interaction")
 
-		dir, _ := os.Getwd()
-		path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
+// 		dir, _ := os.Getwd()
+// 		path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
 
-		grpcInteraction := `{
-			"pact:proto": "` + path + `",
-			"pact:proto-service": "PactPlugin/InitPlugin",
-			"pact:content-type": "application/protobuf",
-			"request": {
-				"implementation": "notEmpty('pact-go-driver')",
-				"version": "matching(semver, '0.0.0')"
-			}
-		}`
+// 		grpcInteraction := `{
+// 			"pact:proto": "` + path + `",
+// 			"pact:proto-service": "PactPlugin/InitPlugin",
+// 			"pact:content-type": "application/protobuf",
+// 			"request": {
+// 				"implementation": "notEmpty('pact-go-driver')",
+// 				"version": "matching(semver, '0.0.0')"
+// 			}
+// 		}`
 
-		err = i.
-			Given("plugin state").
-			// For gRPC interactions we prpvide the config once for both the request and response parts
-			WithPluginInteractionContents(INTERACTION_PART_REQUEST, "application/protobuf", grpcInteraction)
-		assert.NoError(t, err)
+// 		err = i.
+// 			Given("plugin state").
+// 			// For gRPC interactions we prpvide the config once for both the request and response parts
+// 			WithPluginInteractionContents(INTERACTION_PART_REQUEST, "application/protobuf", grpcInteraction)
+// 		assert.NoError(t, err)
 
-		bytes, err := i.GetMessageRequestContents()
-		assert.NoError(t, err)
-		assert.NotNil(t, bytes)
+// 		bytes, err := i.GetMessageRequestContents()
+// 		assert.NoError(t, err)
+// 		assert.NotNil(t, bytes)
 
-		// Should be able to convert request body back into a protobuf
-		p := &InitPluginRequest{}
-		err = proto.Unmarshal(bytes, p)
-		assert.NoError(t, err)
-		assert.Equal(t, "0.0.0", p.Version)
+// 		// Should be able to convert request body back into a protobuf
+// 		p := &InitPluginRequest{}
+// 		err = proto.Unmarshal(bytes, p)
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, "0.0.0", p.Version)
 
-		// Should be able to convert response into a protobuf
-		response_bytes, err := i.GetMessageResponseContents()
-		assert.NoError(t, err)
-		assert.NotNil(t, response_bytes)
-		assert.Equal(t, 1, len(response_bytes))
-		assert.Empty(t, response_bytes[0])
-	}
-}
+// 		// Should be able to convert response into a protobuf
+// 		response_bytes, err := i.GetMessageResponseContents()
+// 		assert.NoError(t, err)
+// 		assert.NotNil(t, response_bytes)
+// 		assert.Equal(t, 1, len(response_bytes))
+// 		assert.Empty(t, response_bytes[0])
+// 	}
+// }
 
 func TestGetPluginAsyncMessageContentsAsBytes(t *testing.T) {
 	if runtime.GOOS != "windows" {

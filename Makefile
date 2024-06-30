@@ -42,6 +42,7 @@ docker_build:
 docker_test: docker_build
 	docker run \
 		-e LOG_LEVEL=INFO \
+		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		--rm \
 		-it \
 		pactfoundation/pact-go-test-$(IMAGE_VARIANT) \
@@ -49,6 +50,7 @@ docker_test: docker_build
 docker_pact: docker_build
 	docker run \
 		-e LOG_LEVEL=INFO \
+		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		--rm \
 		-it \
 		pactfoundation/pact-go-test-$(IMAGE_VARIANT) \
@@ -56,6 +58,7 @@ docker_pact: docker_build
 docker_shell: docker_build
 	docker run \
 		-e LOG_LEVEL=INFO \
+		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		-v $$PWD:/go/src/github.com/pact-foundation/pact-go \
 		--rm \
 		-it \

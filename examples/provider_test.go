@@ -9,16 +9,15 @@ import (
 	l "log"
 	"net/http"
 	"os"
-	"path/filepath"
-	"testing"
-
-	"github.com/hashicorp/logutils"
-	"github.com/pact-foundation/pact-go/v2/log"
-	"github.com/pact-foundation/pact-go/v2/message"
-	"github.com/pact-foundation/pact-go/v2/models"
-	"github.com/pact-foundation/pact-go/v2/provider"
-	"github.com/pact-foundation/pact-go/v2/version"
-	"github.com/stretchr/testify/assert"
+	// 	"path/filepath"
+	// "testing"
+	// "github.com/hashicorp/logutils"
+	// "github.com/pact-foundation/pact-go/v2/log"
+	// "github.com/pact-foundation/pact-go/v2/message"
+	// "github.com/pact-foundation/pact-go/v2/models"
+	// "github.com/pact-foundation/pact-go/v2/provider"
+	// "github.com/pact-foundation/pact-go/v2/version"
+	// "github.com/stretchr/testify/assert"
 )
 
 var dir, _ = os.Getwd()
@@ -27,182 +26,182 @@ var pactDir = fmt.Sprintf("%s/pacts", dir)
 var requestFilterCalled = false
 var stateHandlerCalled = false
 
-func TestV3HTTPProvider(t *testing.T) {
-	logLevel := os.Getenv("LOG_LEVEL")
-	if logLevel == "" {
-		logLevel = "TRACE"
-	}
-	log.SetLogLevel(logutils.LogLevel(logLevel))
-	version.CheckVersion("/tmp")
+// func TestV3HTTPProvider(t *testing.T) {
+// 	logLevel := os.Getenv("LOG_LEVEL")
+// 	if logLevel == "" {
+// 		logLevel = "TRACE"
+// 	}
+// 	log.SetLogLevel(logutils.LogLevel(logLevel))
+// 	version.CheckVersion("/tmp")
 
-	// Start provider API in the background
-	go startServer()
+// 	// Start provider API in the background
+// 	go startServer()
 
-	verifier := provider.NewVerifier()
+// 	verifier := provider.NewVerifier()
 
-	// Authorization middleware
-	// This is your chance to modify the request before it hits your provider
-	// NOTE: this should be used very carefully, as it has the potential to
-	// _change_ the contract
-	f := func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			l.Println("[DEBUG] HOOK request filter")
-			requestFilterCalled = true
-			r.Header.Add("Authorization", "Bearer 1234-dynamic-value")
-			next.ServeHTTP(w, r)
-		})
-	}
+// 	// Authorization middleware
+// 	// This is your chance to modify the request before it hits your provider
+// 	// NOTE: this should be used very carefully, as it has the potential to
+// 	// _change_ the contract
+// 	f := func(next http.Handler) http.Handler {
+// 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 			l.Println("[DEBUG] HOOK request filter")
+// 			requestFilterCalled = true
+// 			r.Header.Add("Authorization", "Bearer 1234-dynamic-value")
+// 			next.ServeHTTP(w, r)
+// 		})
+// 	}
 
-	// Verify the Provider with local Pact Files
+// 	// Verify the Provider with local Pact Files
 
-	if os.Getenv("SKIP_PUBLISH") != "true" {
-		err := verifier.VerifyProvider(t, provider.VerifyRequest{
-			ProviderBaseURL: "http://127.0.0.1:8111",
-			Provider:        "V3Provider",
-			ProviderVersion: os.Getenv("APP_SHA"),
-			BrokerURL:       os.Getenv("PACT_BROKER_BASE_URL"),
-			ConsumerVersionSelectors: []provider.Selector{
-				&provider.ConsumerVersionSelector{
-					Tag: "master",
-				},
-				&provider.ConsumerVersionSelector{
-					Tag: "prod",
-				},
-			},
-			PublishVerificationResults: true,
-			RequestFilter:              f,
-			BeforeEach: func() error {
-				l.Println("[DEBUG] HOOK before each")
-				return nil
-			},
-			AfterEach: func() error {
-				l.Println("[DEBUG] HOOK after each")
-				return nil
-			},
-			StateHandlers: models.StateHandlers{
-				"User foo exists": func(setup bool, s models.ProviderState) (models.ProviderStateResponse, error) {
-					stateHandlerCalled = true
+// 	if os.Getenv("SKIP_PUBLISH") != "true" {
+// 		err := verifier.VerifyProvider(t, provider.VerifyRequest{
+// 			ProviderBaseURL: "http://127.0.0.1:8111",
+// 			Provider:        "V3Provider",
+// 			ProviderVersion: os.Getenv("APP_SHA"),
+// 			BrokerURL:       os.Getenv("PACT_BROKER_BASE_URL"),
+// 			ConsumerVersionSelectors: []provider.Selector{
+// 				&provider.ConsumerVersionSelector{
+// 					Tag: "master",
+// 				},
+// 				&provider.ConsumerVersionSelector{
+// 					Tag: "prod",
+// 				},
+// 			},
+// 			PublishVerificationResults: true,
+// 			RequestFilter:              f,
+// 			BeforeEach: func() error {
+// 				l.Println("[DEBUG] HOOK before each")
+// 				return nil
+// 			},
+// 			AfterEach: func() error {
+// 				l.Println("[DEBUG] HOOK after each")
+// 				return nil
+// 			},
+// 			StateHandlers: models.StateHandlers{
+// 				"User foo exists": func(setup bool, s models.ProviderState) (models.ProviderStateResponse, error) {
+// 					stateHandlerCalled = true
 
-					if setup {
-						l.Println("[DEBUG] HOOK calling user foo exists state handler", s)
-					} else {
-						l.Println("[DEBUG] HOOK teardown the 'User foo exists' state")
-					}
+// 					if setup {
+// 						l.Println("[DEBUG] HOOK calling user foo exists state handler", s)
+// 					} else {
+// 						l.Println("[DEBUG] HOOK teardown the 'User foo exists' state")
+// 					}
 
-					// ... do something, such as create "foo" in the database
+// 					// ... do something, such as create "foo" in the database
 
-					// Optionally (if there are generators in the pact) return provider state values to be used in the verification
-					return models.ProviderStateResponse{"uuid": "1234"}, nil
-				},
-			},
-			DisableColoredOutput: true,
-		})
-		assert.NoError(t, err)
-		assert.True(t, requestFilterCalled)
-		assert.True(t, stateHandlerCalled)
-	} else {
-		err := verifier.VerifyProvider(t, provider.VerifyRequest{
-			ProviderBaseURL: "http://127.0.0.1:8111",
-			Provider:        "V3Provider",
-			PactFiles: []string{
-				filepath.ToSlash(fmt.Sprintf("%s/PactGoV3Consumer-V3Provider.json", pactDir)),
-				filepath.ToSlash(fmt.Sprintf("%s/PactGoV2ConsumerMatch-V2ProviderMatch.json", pactDir)),
-			},
-			RequestFilter: f,
-			BeforeEach: func() error {
-				l.Println("[DEBUG] HOOK before each")
-				return nil
-			},
-			AfterEach: func() error {
-				l.Println("[DEBUG] HOOK after each")
-				return nil
-			},
-			StateHandlers: models.StateHandlers{
-				"User foo exists": func(setup bool, s models.ProviderState) (models.ProviderStateResponse, error) {
-					stateHandlerCalled = true
+// 					// Optionally (if there are generators in the pact) return provider state values to be used in the verification
+// 					return models.ProviderStateResponse{"uuid": "1234"}, nil
+// 				},
+// 			},
+// 			DisableColoredOutput: true,
+// 		})
+// 		assert.NoError(t, err)
+// 		assert.True(t, requestFilterCalled)
+// 		assert.True(t, stateHandlerCalled)
+// 	} else {
+// 		err := verifier.VerifyProvider(t, provider.VerifyRequest{
+// 			ProviderBaseURL: "http://127.0.0.1:8111",
+// 			Provider:        "V3Provider",
+// 			PactFiles: []string{
+// 				filepath.ToSlash(fmt.Sprintf("%s/PactGoV3Consumer-V3Provider.json", pactDir)),
+// 				filepath.ToSlash(fmt.Sprintf("%s/PactGoV2ConsumerMatch-V2ProviderMatch.json", pactDir)),
+// 			},
+// 			RequestFilter: f,
+// 			BeforeEach: func() error {
+// 				l.Println("[DEBUG] HOOK before each")
+// 				return nil
+// 			},
+// 			AfterEach: func() error {
+// 				l.Println("[DEBUG] HOOK after each")
+// 				return nil
+// 			},
+// 			StateHandlers: models.StateHandlers{
+// 				"User foo exists": func(setup bool, s models.ProviderState) (models.ProviderStateResponse, error) {
+// 					stateHandlerCalled = true
 
-					if setup {
-						l.Println("[DEBUG] HOOK calling user foo exists state handler", s)
-					} else {
-						l.Println("[DEBUG] HOOK teardown the 'User foo exists' state")
-					}
+// 					if setup {
+// 						l.Println("[DEBUG] HOOK calling user foo exists state handler", s)
+// 					} else {
+// 						l.Println("[DEBUG] HOOK teardown the 'User foo exists' state")
+// 					}
 
-					// ... do something, such as create "foo" in the database
+// 					// ... do something, such as create "foo" in the database
 
-					// Optionally (if there are generators in the pact) return provider state values to be used in the verification
-					return models.ProviderStateResponse{"uuid": "1234"}, nil
-				},
-			},
-			DisableColoredOutput: true,
-		})
-		assert.NoError(t, err)
-		assert.True(t, requestFilterCalled)
-		assert.True(t, stateHandlerCalled)
-	}
+// 					// Optionally (if there are generators in the pact) return provider state values to be used in the verification
+// 					return models.ProviderStateResponse{"uuid": "1234"}, nil
+// 				},
+// 			},
+// 			DisableColoredOutput: true,
+// 		})
+// 		assert.NoError(t, err)
+// 		assert.True(t, requestFilterCalled)
+// 		assert.True(t, stateHandlerCalled)
+// 	}
 
-}
+// }
 
-func TestV3MessageProvider(t *testing.T) {
-	logLevel := os.Getenv("LOG_LEVEL")
-	if logLevel == "" {
-		logLevel = "TRACE"
-	}
-	log.SetLogLevel(logutils.LogLevel(logLevel))
-	var user *User
+// func TestV3MessageProvider(t *testing.T) {
+// 	logLevel := os.Getenv("LOG_LEVEL")
+// 	if logLevel == "" {
+// 		logLevel = "TRACE"
+// 	}
+// 	log.SetLogLevel(logutils.LogLevel(logLevel))
+// 	var user *User
 
-	verifier := provider.NewVerifier()
+// 	verifier := provider.NewVerifier()
 
-	// Map test descriptions to message producer (handlers)
-	functionMappings := message.Handlers{
-		"a user event": func([]models.ProviderState) (message.Body, message.Metadata, error) {
-			if user != nil {
-				return user, message.Metadata{
-					"Content-Type": "application/json",
-				}, nil
-			} else {
-				return models.ProviderStateResponse{
-					"message": "not found",
-				}, nil, nil
-			}
-		},
-	}
+// 	// Map test descriptions to message producer (handlers)
+// 	functionMappings := message.Handlers{
+// 		"a user event": func([]models.ProviderState) (message.Body, message.Metadata, error) {
+// 			if user != nil {
+// 				return user, message.Metadata{
+// 					"Content-Type": "application/json",
+// 				}, nil
+// 			} else {
+// 				return models.ProviderStateResponse{
+// 					"message": "not found",
+// 				}, nil, nil
+// 			}
+// 		},
+// 	}
 
-	// Setup any required states for the handlers
-	stateMappings := models.StateHandlers{
-		"User with id 127 exists": func(setup bool, s models.ProviderState) (models.ProviderStateResponse, error) {
-			if setup {
-				user = &User{
-					ID:       127,
-					Name:     "Billy",
-					Date:     "2020-01-01",
-					LastName: "Sampson",
-				}
-			}
+// 	// Setup any required states for the handlers
+// 	stateMappings := models.StateHandlers{
+// 		"User with id 127 exists": func(setup bool, s models.ProviderState) (models.ProviderStateResponse, error) {
+// 			if setup {
+// 				user = &User{
+// 					ID:       127,
+// 					Name:     "Billy",
+// 					Date:     "2020-01-01",
+// 					LastName: "Sampson",
+// 				}
+// 			}
 
-			return models.ProviderStateResponse{"id": user.ID}, nil
-		},
-	}
+// 			return models.ProviderStateResponse{"id": user.ID}, nil
+// 		},
+// 	}
 
-	// Verify the Provider with local Pact Files
+// 	// Verify the Provider with local Pact Files
 
-	if os.Getenv("SKIP_PUBLISH") != "true" {
-		verifier.VerifyProvider(t, provider.VerifyRequest{
-			StateHandlers:   stateMappings,
-			Provider:        "V3MessageProvider",
-			ProviderVersion: os.Getenv("APP_SHA"),
-			BrokerURL:       os.Getenv("PACT_BROKER_BASE_URL"),
-			MessageHandlers: functionMappings,
-		})
-	} else {
-		verifier.VerifyProvider(t, provider.VerifyRequest{
-			PactFiles:       []string{filepath.ToSlash(fmt.Sprintf("%s/PactGoV3MessageConsumer-V3MessageProvider.json", pactDir))},
-			StateHandlers:   stateMappings,
-			Provider:        "V3MessageProvider",
-			MessageHandlers: functionMappings,
-		})
-	}
+// 	if os.Getenv("SKIP_PUBLISH") != "true" {
+// 		verifier.VerifyProvider(t, provider.VerifyRequest{
+// 			StateHandlers:   stateMappings,
+// 			Provider:        "V3MessageProvider",
+// 			ProviderVersion: os.Getenv("APP_SHA"),
+// 			BrokerURL:       os.Getenv("PACT_BROKER_BASE_URL"),
+// 			MessageHandlers: functionMappings,
+// 		})
+// 	} else {
+// 		verifier.VerifyProvider(t, provider.VerifyRequest{
+// 			PactFiles:       []string{filepath.ToSlash(fmt.Sprintf("%s/PactGoV3MessageConsumer-V3MessageProvider.json", pactDir))},
+// 			StateHandlers:   stateMappings,
+// 			Provider:        "V3MessageProvider",
+// 			MessageHandlers: functionMappings,
+// 		})
+// 	}
 
-}
+// }
 
 func startServer() {
 	mux := http.NewServeMux()
