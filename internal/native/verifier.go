@@ -69,11 +69,12 @@ static void install_signal_handlers()
 	}
 #endif
 */
-import "C"
+// import "C"
 import (
 	"fmt"
 	"log"
-	"runtime"
+
+	// "runtime"
 	"strings"
 )
 
@@ -189,9 +190,9 @@ func (v *Verifier) SetPublishOptions(providerVersion string, buildUrl string, pr
 
 func (v *Verifier) Execute() error {
 	// TODO: Validate
-	if runtime.GOOS != "windows" {
-		C.install_signal_handlers()
-	}
+	// if runtime.GOOS != "windows" {
+	// 	C.install_signal_handlers()
+	// }
 	result := pactffi_verifier_execute(v.handle)
 	/// | Error | Description |
 	/// |-------|-------------|

@@ -69,13 +69,13 @@ static void install_signal_handlers()
 	}
 #endif
 */
-import "C"
+// import "C"
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
-	"runtime"
+	// "runtime"
 	"unsafe"
 )
 
@@ -266,9 +266,9 @@ func (m *Message) WithContents(part interactionPart, contentType string, body []
 func (m *MessageServer) UsingPlugin(pluginName string, pluginVersion string) error {
 
 	r := pactffi_using_plugin(m.messagePact.handle, pluginName, pluginVersion)
-	if runtime.GOOS != "windows" {
-		C.install_signal_handlers()
-	}
+	// if runtime.GOOS != "windows" {
+	// 	C.install_signal_handlers()
+	// }
 	// 1 - A general panic was caught.
 	// 2 - Failed to load the plugin.
 	// 3 - Pact Handle is not valid.

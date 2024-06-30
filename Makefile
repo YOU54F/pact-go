@@ -15,7 +15,12 @@ PACT_DOWNLOAD_DIR=/tmp
 ifeq ($(OS),Windows_NT)
 	PACT_DOWNLOAD_DIR=$$TMP
 endif
-
+CGO_ENABLED?=1
+ifeq ($(CGO_ENABLED),0)
+	SKIP_RACE=true
+endif
+SKIP_RACE?=false
+DOCKER_ARCH?=arm64
 # Run the ci target from a developer machine with the environment variables
 # set as if it was on Travis CI.
 # Use this for quick feedback when playing around with your workflows.
@@ -41,7 +46,10 @@ docker_build:
 
 docker_test: docker_build
 	docker run \
+		--platform linux/$(DOCKER_ARCH) \
 		-e LOG_LEVEL=INFO \
+		-e SKIP_RACE=$(SKIP_RACE) \
+		-e CGO_ENABLED=$(CGO_ENABLED) \
 		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		--rm \
 		-it \
@@ -49,7 +57,10 @@ docker_test: docker_build
 		/bin/sh -c "make test"
 docker_pact: docker_build
 	docker run \
+		--platform linux/$(DOCKER_ARCH) \
 		-e LOG_LEVEL=INFO \
+		-e SKIP_RACE=$(SKIP_RACE) \
+		-e CGO_ENABLED=$(CGO_ENABLED) \
 		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		--rm \
 		-it \
@@ -57,6 +68,9 @@ docker_pact: docker_build
 		/bin/sh -c "make pact_local"
 docker_shell: docker_build
 	docker run \
+		--platform linux/$(DOCKER_ARCH) \
+		-e SKIP_RACE=$(SKIP_RACE) \
+		-e CGO_ENABLED=$(CGO_ENABLED) \
 		-e LOG_LEVEL=INFO \
 		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		-v $$PWD:/go/src/github.com/pact-foundation/pact-go \
@@ -117,13 +131,13 @@ install: bin
 
 pact: clean install docker
 	@echo "--- 🔨 Running Pact examples"
-	go test -v $(SKIP_RACE) -tags=consumer -count=1 github.com/pact-foundation/pact-go/v2/examples/...
+	go test -v $(RACE) -tags=consumer -count=1 github.com/pact-foundation/pact-go/v2/examples/...
 	make publish
-	go test -v $(SKIP_RACE) -timeout=30s -tags=provider -count=1 github.com/pact-foundation/pact-go/v2/examples/...
-pact_local: clean download_plugins install 
+	go test -v $(RACE) -timeout=30s -tags=provider -count=1 github.com/pact-foundation/pact-go/v2/examples/...
+pact_local: clean deps install 
 	@echo "--- 🔨 Running Pact examples"
-	go test -v $(SKIP_RACE) -tags=consumer -count=1 github.com/pact-foundation/pact-go/v2/examples/...
-	SKIP_PUBLISH=true go test -v $(SKIP_RACE) -timeout=30s -tags=provider -count=1 github.com/pact-foundation/pact-go/v2/examples/...
+	go test -v $(RACE) -tags=consumer -count=1 github.com/pact-foundation/pact-go/v2/examples/...
+	SKIP_PUBLISH=true go test -v $(RACE) -timeout=30s -tags=provider -count=1 github.com/pact-foundation/pact-go/v2/examples/...
 
 publish:
 	@echo "-- 📃 Publishing pacts"
@@ -133,9 +147,9 @@ release:
 	echo "--- 🚀 Releasing it"
 	"$(CURDIR)/scripts/release.sh"
 
-RACE?='-race'
+RACE?=-race
 
-ifdef SKIP_RACE
+ifeq ($(SKIP_RACE),true)
 	RACE=
 endif
 

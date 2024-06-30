@@ -69,7 +69,7 @@ static void install_signal_handlers()
 	}
 #endif
 */
-import "C"
+// import "C"
 import (
 	"crypto/tls"
 	"crypto/x509"
@@ -77,7 +77,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime"
+
+	// "runtime"
 	"strings"
 )
 
@@ -435,9 +436,9 @@ func (m *MockServer) WithMetadata(namespace, k, v string) *MockServer {
 func (m *MockServer) UsingPlugin(pluginName string, pluginVersion string) error {
 
 	r := pactffi_using_plugin(m.pact.handle, pluginName, pluginVersion)
-	if runtime.GOOS != "windows" {
-		C.install_signal_handlers()
-	}
+	// if runtime.GOOS != "windows" {
+	// 	C.install_signal_handlers()
+	// }
 	// 1 - A general panic was caught.
 	// 2 - Failed to load the plugin.
 	// 3 - Pact Handle is not valid.
