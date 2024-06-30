@@ -108,14 +108,14 @@ jobs:
         env:
           DOCKER_ARCH: ${{ matrix.arch }}
           GO_VERSION: ${{ matrix.go-version }}
-          VARIANT: ${{ matrix.variant }}
+          IMAGE_VARIANT: ${{ matrix.variant }}
           CGO_ENABLED: ${{ matrix.cgo }}
       - name: Test (pact)
         run: make docker_pact
         env:
           DOCKER_ARCH: ${{ matrix.arch }}
           GO_VERSION: ${{ matrix.go-version }}
-          VARIANT: ${{ matrix.variant }}
+          IMAGE_VARIANT: ${{ matrix.variant }}
           CGO_ENABLED: ${{ matrix.cgo }}
     
       # - name: Build ${{ matrix.arch }} dockerfile 
