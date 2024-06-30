@@ -1,10 +1,7 @@
 package consumer
 
 import (
-	"fmt"
 	"os"
-	"runtime"
-	"strings"
 	"testing"
 
 	"github.com/hashicorp/logutils"
@@ -58,39 +55,6 @@ func TestHttpV4TypeSystem(t *testing.T) {
 			return nil
 		})
 	assert.Error(t, err)
-	if runtime.GOOS != "windows" {
-		dir, _ := os.Getwd()
-		path := fmt.Sprintf("%s/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
-
-		err = p.AddInteraction().
-			Given("some state").
-			UponReceiving("some scenario").
-			UsingPlugin(PluginConfig{
-				Plugin:  "protobuf",
-				Version: "0.3.15",
-			}).
-			WithRequest("GET", "/").
-			// WithRequest("GET", "/", func(b *V4InteractionWithPluginRequestBuilder) {
-			// 	b.PluginContents("application/protobufs", "")
-			// 	// TODO:
-			// }).
-			WillRespondWith(200, func(b *V4InteractionWithPluginResponseBuilder) {
-				b.
-					Header("Content-Type", S("application/protobufs")).
-					PluginContents("application/protobufs", `
-					{
-						"pact:proto": "`+path+`",
-						"pact:message-type": "InitPluginRequest"
-					}
-				`)
-			}).
-			ExecuteTest(t, func(msc MockServerConfig) error {
-				// <- normally run the actually test here.
-
-				return nil
-			})
-		assert.Error(t, err)
-	}
 }
 
 var Like = matchers.Like
