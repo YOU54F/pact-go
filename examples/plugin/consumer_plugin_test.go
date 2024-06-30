@@ -12,7 +12,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -26,73 +25,73 @@ import (
 var dir, _ = os.Getwd()
 
 func TestHTTPPlugin(t *testing.T) {
-	if runtime.GOOS != "windows" {
-		mockProvider, err := consumer.NewV4Pact(consumer.MockHTTPProviderConfig{
-			Consumer: "MattConsumer",
-			Provider: "MattProvider",
-			PactDir:  filepath.ToSlash(fmt.Sprintf("%s/../pacts", dir)),
+
+	mockProvider, err := consumer.NewV4Pact(consumer.MockHTTPProviderConfig{
+		Consumer: "MattConsumer",
+		Provider: "MattProvider",
+		PactDir:  filepath.ToSlash(fmt.Sprintf("%s/../pacts", dir)),
+	})
+	assert.NoError(t, err)
+
+	// MATT is a protocol, where all message start and end with a MATT
+	mattRequest := `{"request": {"body": "hello"}}`
+	mattResponse := `{"response":{"body":"world"}}`
+
+	// Set up our expected interactions.
+	err = mockProvider.
+		AddInteraction().
+		UponReceiving("A request to do a matt").
+		UsingPlugin(consumer.PluginConfig{
+			Plugin:  "matt",
+			Version: "0.1.1",
+		}).
+		WithRequest("POST", "/matt", func(req *consumer.V4InteractionWithPluginRequestBuilder) {
+			req.PluginContents("application/matt", mattRequest)
+		}).
+		WillRespondWith(200, func(res *consumer.V4InteractionWithPluginResponseBuilder) {
+			res.PluginContents("application/matt", mattResponse)
+		}).
+		ExecuteTest(t, func(msc consumer.MockServerConfig) error {
+			resp, err := callMattServiceHTTP(msc, "hello")
+
+			assert.Equal(t, "world", resp)
+
+			return err
 		})
-		assert.NoError(t, err)
+	assert.NoError(t, err)
 
-		// MATT is a protocol, where all message start and end with a MATT
-		mattRequest := `{"request": {"body": "hello"}}`
-		mattResponse := `{"response":{"body":"world"}}`
-
-		// Set up our expected interactions.
-		err = mockProvider.
-			AddInteraction().
-			UponReceiving("A request to do a matt").
-			UsingPlugin(consumer.PluginConfig{
-				Plugin:  "matt",
-				Version: "0.1.1",
-			}).
-			WithRequest("POST", "/matt", func(req *consumer.V4InteractionWithPluginRequestBuilder) {
-				req.PluginContents("application/matt", mattRequest)
-			}).
-			WillRespondWith(200, func(res *consumer.V4InteractionWithPluginResponseBuilder) {
-				res.PluginContents("application/matt", mattResponse)
-			}).
-			ExecuteTest(t, func(msc consumer.MockServerConfig) error {
-				resp, err := callMattServiceHTTP(msc, "hello")
-
-				assert.Equal(t, "world", resp)
-
-				return err
-			})
-		assert.NoError(t, err)
-	}
 }
 
 func TestTCPPlugin(t *testing.T) {
-	if runtime.GOOS != "windows" {
-		p, _ := message.NewSynchronousPact(message.Config{
-			Consumer: "matttcpconsumer",
-			Provider: "matttcpprovider",
-			PactDir:  filepath.ToSlash(fmt.Sprintf("%s/../pacts", dir)),
+
+	p, _ := message.NewSynchronousPact(message.Config{
+		Consumer: "matttcpconsumer",
+		Provider: "matttcpprovider",
+		PactDir:  filepath.ToSlash(fmt.Sprintf("%s/../pacts", dir)),
+	})
+
+	// MATT is a protocol, where all message start and end with a MATT
+	mattMessage := `{"request": {"body": "hellotcp"}, "response":{"body":"tcpworld"}}`
+
+	err := p.AddSynchronousMessage("Matt message").
+		Given("the world exists").
+		UsingPlugin(message.PluginConfig{
+			Plugin:  "matt",
+			Version: "0.1.1",
+		}).
+		WithContents(mattMessage, "application/matt").
+		StartTransport("matt", "127.0.0.1", nil). // For plugin tests, we can't assume if a transport is needed, so this is optional
+		ExecuteTest(t, func(transport message.TransportConfig, m message.SynchronousMessage) error {
+			fmt.Println("matt TCP transport running on", transport)
+
+			str, err := callMattServiceTCP(transport, "hellotcp")
+
+			assert.Equal(t, "tcpworld", str)
+			return err
 		})
 
-		// MATT is a protocol, where all message start and end with a MATT
-		mattMessage := `{"request": {"body": "hellotcp"}, "response":{"body":"tcpworld"}}`
+	assert.NoError(t, err)
 
-		err := p.AddSynchronousMessage("Matt message").
-			Given("the world exists").
-			UsingPlugin(message.PluginConfig{
-				Plugin:  "matt",
-				Version: "0.1.1",
-			}).
-			WithContents(mattMessage, "application/matt").
-			StartTransport("matt", "127.0.0.1", nil). // For plugin tests, we can't assume if a transport is needed, so this is optional
-			ExecuteTest(t, func(transport message.TransportConfig, m message.SynchronousMessage) error {
-				fmt.Println("matt TCP transport running on", transport)
-
-				str, err := callMattServiceTCP(transport, "hellotcp")
-
-				assert.Equal(t, "tcpworld", str)
-				return err
-			})
-
-		assert.NoError(t, err)
-	}
 }
 
 func callMattServiceHTTP(msc consumer.MockServerConfig, message string) (string, error) {

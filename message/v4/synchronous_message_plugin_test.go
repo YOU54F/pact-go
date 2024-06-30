@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -17,20 +16,20 @@ import (
 )
 
 func TestSyncPluginTypeSystem(t *testing.T) {
-	if runtime.GOOS != "windows" {
-		p, _ := NewSynchronousPact(Config{
-			Consumer: "consumer",
-			Provider: "provider",
-			PactDir:  "/tmp/",
-		})
-		logLevel := os.Getenv("LOG_LEVEL")
-		if logLevel == "" {
-			logLevel = "TRACE"
-		}
-		_ = log.SetLogLevel(logutils.LogLevel(logLevel))
 
-		// Sync - with plugin, but no transport
-		csvInteraction := `{
+	p, _ := NewSynchronousPact(Config{
+		Consumer: "consumer",
+		Provider: "provider",
+		PactDir:  "/tmp/",
+	})
+	logLevel := os.Getenv("LOG_LEVEL")
+	if logLevel == "" {
+		logLevel = "TRACE"
+	}
+	_ = log.SetLogLevel(logutils.LogLevel(logLevel))
+
+	// Sync - with plugin, but no transport
+	csvInteraction := `{
 		"request.path": "/reports/report002.csv",
 		"response.status": "200",
 		"response.contents": {
@@ -42,34 +41,34 @@ func TestSyncPluginTypeSystem(t *testing.T) {
 		}
 	}`
 
-		p, _ = NewSynchronousPact(Config{
-			Consumer: "consumer",
-			Provider: "provider",
-			PactDir:  "/tmp/",
-		})
-		_ = p.AddSynchronousMessage("some description").
-			Given("some state").
-			UsingPlugin(PluginConfig{
-				Plugin:  "csv",
-				Version: "0.0.6",
-			}).
-			WithContents(csvInteraction, "text/csv").
-			ExecuteTest(t, func(m SynchronousMessage) error {
-				fmt.Println("Executing the CSV test")
-				return nil
-			})
-
-		p, _ = NewSynchronousPact(Config{
-			Consumer: "consumer",
-			Provider: "provider",
-			PactDir:  "/tmp/",
+	p, _ = NewSynchronousPact(Config{
+		Consumer: "consumer",
+		Provider: "provider",
+		PactDir:  "/tmp/",
+	})
+	_ = p.AddSynchronousMessage("some description").
+		Given("some state").
+		UsingPlugin(PluginConfig{
+			Plugin:  "csv",
+			Version: "0.0.6",
+		}).
+		WithContents(csvInteraction, "text/csv").
+		ExecuteTest(t, func(m SynchronousMessage) error {
+			fmt.Println("Executing the CSV test")
+			return nil
 		})
 
-		// Sync - with plugin + transport (pass)
-		dir, _ := os.Getwd()
-		path := fmt.Sprintf("%s/../../internal/native/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
+	p, _ = NewSynchronousPact(Config{
+		Consumer: "consumer",
+		Provider: "provider",
+		PactDir:  "/tmp/",
+	})
 
-		grpcInteraction := `{
+	// Sync - with plugin + transport (pass)
+	dir, _ := os.Getwd()
+	path := fmt.Sprintf("%s/../../internal/native/pact_plugin.proto", strings.ReplaceAll(dir, "\\", "/"))
+
+	grpcInteraction := `{
 		"pact:proto": "` + path + `",
 		"pact:proto-service": "PactPlugin/InitPlugin",
 		"pact:content-type": "application/protobuf",
@@ -87,43 +86,43 @@ func TestSyncPluginTypeSystem(t *testing.T) {
 		}
 	}`
 
-		err := p.AddSynchronousMessage("some description").
-			Given("some state").
-			UsingPlugin(PluginConfig{
-				Plugin:  "protobuf",
-				Version: "0.3.15",
-			}).
-			WithContents(grpcInteraction, "application/protobuf").
-			StartTransport("grpc", "127.0.0.1", nil). // For plugin tests, we can't assume if a transport is needed, so this is optional
-			ExecuteTest(t, func(t TransportConfig, m SynchronousMessage) error {
-				fmt.Println("Executing a test - this is where you would normally make the gRPC call")
+	err := p.AddSynchronousMessage("some description").
+		Given("some state").
+		UsingPlugin(PluginConfig{
+			Plugin:  "protobuf",
+			Version: "0.3.15",
+		}).
+		WithContents(grpcInteraction, "application/protobuf").
+		StartTransport("grpc", "127.0.0.1", nil). // For plugin tests, we can't assume if a transport is needed, so this is optional
+		ExecuteTest(t, func(t TransportConfig, m SynchronousMessage) error {
+			fmt.Println("Executing a test - this is where you would normally make the gRPC call")
 
-				return nil
-			})
-
-		assert.Error(t, err)
-
-		p, _ = NewSynchronousPact(Config{
-			Consumer: "consumer",
-			Provider: "provider",
-			PactDir:  "/tmp/",
+			return nil
 		})
 
-		// Sync - with plugin + transport (fail)
-		err = p.AddSynchronousMessage("some description").
-			Given("some state").
-			UsingPlugin(PluginConfig{
-				Plugin:  "protobuf",
-				Version: "0.3.15",
-			}).
-			WithContents(grpcInteraction, "application/protobuf").
-			StartTransport("grpc", "127.0.0.1", nil). // For plugin tests, we can't assume if a transport is needed, so this is optional
-			ExecuteTest(t, func(t TransportConfig, m SynchronousMessage) error {
-				fmt.Println("Executing a test - this is where you would normally make the gRPC call")
+	assert.Error(t, err)
 
-				return errors.New("bad thing")
-			})
+	p, _ = NewSynchronousPact(Config{
+		Consumer: "consumer",
+		Provider: "provider",
+		PactDir:  "/tmp/",
+	})
 
-		assert.Error(t, err)
-	}
+	// Sync - with plugin + transport (fail)
+	err = p.AddSynchronousMessage("some description").
+		Given("some state").
+		UsingPlugin(PluginConfig{
+			Plugin:  "protobuf",
+			Version: "0.3.15",
+		}).
+		WithContents(grpcInteraction, "application/protobuf").
+		StartTransport("grpc", "127.0.0.1", nil). // For plugin tests, we can't assume if a transport is needed, so this is optional
+		ExecuteTest(t, func(t TransportConfig, m SynchronousMessage) error {
+			fmt.Println("Executing a test - this is where you would normally make the gRPC call")
+
+			return errors.New("bad thing")
+		})
+
+	assert.Error(t, err)
+
 }

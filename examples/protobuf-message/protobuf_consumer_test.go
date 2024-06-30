@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -18,18 +17,17 @@ import (
 var dir, _ = os.Getwd()
 
 func TestPluginMessageConsumer(t *testing.T) {
-	if runtime.GOOS != "windows" {
 
-		p, _ := message.NewAsynchronousPact(message.Config{
-			Consumer: "protobufmessageconsumer",
-			Provider: "protobufmessageprovider",
-			PactDir:  filepath.ToSlash(fmt.Sprintf("%s/../pacts", dir)),
-		})
+	p, _ := message.NewAsynchronousPact(message.Config{
+		Consumer: "protobufmessageconsumer",
+		Provider: "protobufmessageprovider",
+		PactDir:  filepath.ToSlash(fmt.Sprintf("%s/../pacts", dir)),
+	})
 
-		dir, _ := os.Getwd()
-		path := fmt.Sprintf("%s/../grpc/routeguide/route_guide.proto", strings.ReplaceAll(dir, "\\", "/"))
+	dir, _ := os.Getwd()
+	path := fmt.Sprintf("%s/../grpc/routeguide/route_guide.proto", strings.ReplaceAll(dir, "\\", "/"))
 
-		protoMessage := `{
+	protoMessage := `{
 		"pact:proto": "` + path + `",
 		"pact:message-type": "Feature",
 		"pact:content-type": "application/protobuf",
@@ -41,19 +39,19 @@ func TestPluginMessageConsumer(t *testing.T) {
 		}
 	}`
 
-		err := p.AddAsynchronousMessage().
-			Given("the world exists").
-			ExpectsToReceive("feature message").
-			UsingPlugin(message.PluginConfig{
-				Plugin:  "protobuf",
-				Version: "0.3.15",
-			}).
-			WithContents(protoMessage, "application/protobuf").
-			ExecuteTest(t, func(m message.AsynchronousMessage) error {
-				// TODO: normally would actually read/consume the message
-				return nil
-			})
+	err := p.AddAsynchronousMessage().
+		Given("the world exists").
+		ExpectsToReceive("feature message").
+		UsingPlugin(message.PluginConfig{
+			Plugin:  "protobuf",
+			Version: "0.3.15",
+		}).
+		WithContents(protoMessage, "application/protobuf").
+		ExecuteTest(t, func(m message.AsynchronousMessage) error {
+			// TODO: normally would actually read/consume the message
+			return nil
+		})
 
-		assert.NoError(t, err)
-	}
+	assert.NoError(t, err)
+
 }
