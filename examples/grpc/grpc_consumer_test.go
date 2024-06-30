@@ -1,5 +1,5 @@
-//go:build consumer || plugin
-// +build consumer plugin
+//go:build consumer && plugin
+// +build consumer,plugin
 
 package grpc
 

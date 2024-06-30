@@ -1,5 +1,5 @@
-//go:build provider || plugin
-// +build provider plugin
+//go:build provider && plugin
+// +build provider,plugin
 
 package plugin
 
