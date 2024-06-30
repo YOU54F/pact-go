@@ -77,7 +77,7 @@ jobs:
         run: goveralls -coverprofile=coverage.txt -service=github -parallel
       - uses: actions/upload-artifact@v4
         with:
-          name: logs-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.go-version }}-${{ matrix.os }}.zip
+          name: logs-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.go-version }}-${{ matrix.os }}-cgo-${{ matrix.cgo }}.zip
           path: ~/.pact/plugins/**/plugin.log
         if: ${{ always() }}
 
