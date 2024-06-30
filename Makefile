@@ -52,7 +52,6 @@ docker_test: docker_build
 		-e CGO_ENABLED=$(CGO_ENABLED) \
 		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		--rm \
-		-it \
 		pactfoundation/pact-go-test-$(IMAGE_VARIANT) \
 		/bin/sh -c "make test"
 docker_pact: docker_build
@@ -63,7 +62,6 @@ docker_pact: docker_build
 		-e CGO_ENABLED=$(CGO_ENABLED) \
 		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		--rm \
-		-it \
 		pactfoundation/pact-go-test-$(IMAGE_VARIANT) \
 		/bin/sh -c "make pact_local"
 docker_shell: docker_build

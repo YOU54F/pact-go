@@ -40,8 +40,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
       - name: "Set CGO_ENABLED: ${{ matrix.cgo }}"
+        if: matrix.os == 'windows-latest'
         run: |
           "CGO_ENABLED=${{ matrix.cgo }}" >> $env:GITHUB_ENV
+      - name: "Set CGO_ENABLED: ${{ matrix.cgo }}"
+        if: matrix.os != 'windows-latest'
+        run: |
+          echo "CGO_ENABLED=${{ matrix.cgo }}" >> $GITHUB_ENV
       - if: matrix.os == 'macos-14'
         run: brew install protobuf
       - name: Test
