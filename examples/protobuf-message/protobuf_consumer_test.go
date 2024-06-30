@@ -1,5 +1,5 @@
-//go:build consumer
-// +build consumer
+//go:build consumer || plugin
+// +build consumer plugin
 
 package protobuf
 
