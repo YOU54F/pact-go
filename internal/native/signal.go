@@ -73,10 +73,15 @@ static void install_signal_handlers()
 #endif
 */
 import "C"
-import "runtime"
+import (
+	"os"
+	"runtime"
+)
 
 func InstallSignalHandlers() {
-	if runtime.GOOS != "windows" {
-		C.install_signal_handlers()
-	}
+    if os.Getenv("SKIP_SIGNAL_HANDLERS") != "true" {
+        if runtime.GOOS != "windows" {
+            C.install_signal_handlers()
+        }
+    }
 }

@@ -39,6 +39,12 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+      - name: "Set RUN_PLUGIN_TESTS if we can install signal handlers (cgo + linux/macos - non musl)"
+        if: matrix.os != 'windows-latest'
+        run: |
+          if [[ "${{ matrix.cgo }}" == 1 ]]; then
+            echo "RUN_PLUGIN_TESTS=true" >> $GITHUB_ENV
+          fi
       - name: "Set CGO_ENABLED: ${{ matrix.cgo }}"
         if: matrix.os == 'windows-latest'
         run: |
@@ -102,7 +108,11 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           platforms: ${{ matrix.arch }}
-
+      - name: "Set RUN_PLUGIN_TESTS if we can install signal handlers (cgo + debian)"
+        run: |
+          if [[ "${{ matrix.cgo }}" == 1 && "${{ matrix.variant }}" == 'debian' ]]; then
+            echo "RUN_PLUGIN_TESTS=true" >> $GITHUB_ENV
+          fi
       - name: Test (unit)
         run: make docker_test
         env:
@@ -110,6 +120,7 @@ jobs:
           GO_VERSION: ${{ matrix.go-version }}
           IMAGE_VARIANT: ${{ matrix.variant }}
           CGO_ENABLED: ${{ matrix.cgo }}
+          RUN_PLUGIN_TESTS: ${{ env.RUN_PLUGIN_TESTS }}
       - name: Test (pact)
         run: make docker_pact
         env:
@@ -117,6 +128,7 @@ jobs:
           GO_VERSION: ${{ matrix.go-version }}
           IMAGE_VARIANT: ${{ matrix.variant }}
           CGO_ENABLED: ${{ matrix.cgo }}
+          RUN_PLUGIN_TESTS: ${{ env.RUN_PLUGIN_TESTS }}
     
       # - name: Build ${{ matrix.arch }} dockerfile 
       #   run: |

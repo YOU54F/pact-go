@@ -21,6 +21,19 @@ ifeq ($(CGO_ENABLED),0)
 endif
 SKIP_RACE?=false
 DOCKER_ARCH?=arm64
+RACE?=-race
+TEST_TAGS?=
+RUN_PLUGIN_TESTS?=
+PLUGIN_TAG=
+PLUGIN_TAGS=
+SKIP_SIGNAL_HANDLERS?=false
+ifeq ($(SKIP_RACE),true)
+	RACE=
+endif
+ifeq ($(RUN_PLUGIN_TESTS),true)
+	PLUGIN_TAGS=-tags=plugin
+	PLUGIN_TAG=,plugin
+endif
 # Run the ci target from a developer machine with the environment variables
 # set as if it was on Travis CI.
 # Use this for quick feedback when playing around with your workflows.
@@ -50,6 +63,8 @@ docker_test: docker_build
 		-e LOG_LEVEL=INFO \
 		-e SKIP_RACE=$(SKIP_RACE) \
 		-e CGO_ENABLED=$(CGO_ENABLED) \
+		-e RUN_PLUGIN_TESTS=$(RUN_PLUGIN_TESTS) \
+		-e SKIP_SIGNAL_HANDLERS=$(SKIP_SIGNAL_HANDLERS) \
 		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		--rm \
 		pactfoundation/pact-go-test-$(IMAGE_VARIANT) \
@@ -60,6 +75,8 @@ docker_pact: docker_build
 		-e LOG_LEVEL=INFO \
 		-e SKIP_RACE=$(SKIP_RACE) \
 		-e CGO_ENABLED=$(CGO_ENABLED) \
+		-e RUN_PLUGIN_TESTS=$(RUN_PLUGIN_TESTS) \
+		-e SKIP_SIGNAL_HANDLERS=$(SKIP_SIGNAL_HANDLERS) \
 		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		--rm \
 		pactfoundation/pact-go-test-$(IMAGE_VARIANT) \
@@ -69,6 +86,8 @@ docker_shell: docker_build
 		--platform linux/$(DOCKER_ARCH) \
 		-e SKIP_RACE=$(SKIP_RACE) \
 		-e CGO_ENABLED=$(CGO_ENABLED) \
+		-e RUN_PLUGIN_TESTS=$(RUN_PLUGIN_TESTS) \
+		-e SKIP_SIGNAL_HANDLERS=$(SKIP_SIGNAL_HANDLERS) \
 		-e LOG_LEVEL=INFO \
 		-e PACT_LD_LIBRARY_PATH=$(PACT_DOWNLOAD_DIR) \
 		-v $$PWD:/go/src/github.com/pact-foundation/pact-go \
@@ -134,8 +153,8 @@ pact: clean install docker
 	go test -v $(RACE) -timeout=30s -tags=provider -count=1 github.com/pact-foundation/pact-go/v2/examples/...
 pact_local: clean deps install 
 	@echo "--- 🔨 Running Pact examples"
-	go test -v $(RACE) -tags=consumer -count=1 github.com/pact-foundation/pact-go/v2/examples/...
-	SKIP_PUBLISH=true go test -v $(RACE) -timeout=30s -tags=provider -count=1 github.com/pact-foundation/pact-go/v2/examples/...
+	go test -v $(RACE) -tags=consumer$(PLUGIN_TAG) -count=1 github.com/pact-foundation/pact-go/v2/examples/...
+	SKIP_PUBLISH=true go test -v $(RACE) -timeout=30s -tags=provider$(PLUGIN_TAG) -count=1 github.com/pact-foundation/pact-go/v2/examples/...
 
 publish:
 	@echo "-- 📃 Publishing pacts"
@@ -145,11 +164,7 @@ release:
 	echo "--- 🚀 Releasing it"
 	"$(CURDIR)/scripts/release.sh"
 
-RACE?=-race
 
-ifeq ($(SKIP_RACE),true)
-	RACE=
-endif
 
 ifeq ($(OS),Windows_NT)
 	SKIP_TESTS+= --test.skip TestHandleBasedMessageTestsWithBinary
@@ -161,7 +176,7 @@ test: deps install
 	@echo "mode: count" > coverage.txt
 	@for d in $$(go list ./... | grep -v vendor | grep -v examples); \
 		do \
-			go test -v $(RACE) -coverprofile=profile.out -covermode=atomic $$d $(SKIP_TESTS); \
+			go test -v $(RACE) -coverprofile=profile.out -covermode=atomic $$d $(SKIP_TESTS) $(PLUGIN_TAGS); \
 			if [ $$? != 0 ]; then \
 				exit 1; \
 			fi; \
