@@ -11,6 +11,7 @@ env:
   # PACT_GO_LIB_DOWNLOAD_PATH: /tmp
   LOG_LEVEL: DEBUG
   COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  RUN_PLUGIN_TESTS: true
 
 jobs:
   test:
