@@ -7,7 +7,7 @@ PACT_CLI="docker run --rm -v ${PWD}:${PWD} -e PACT_BROKER_BASE_URL=$(DOCKER_HOST
 PLUGIN_PACT_PROTOBUF_VERSION=0.3.15
 PLUGIN_PACT_CSV_VERSION=0.0.6
 PLUGIN_PACT_MATT_VERSION=0.1.1
-PLUGIN_PACT_AVRO_VERSION=0.0.5
+PLUGIN_PACT_AVRO_VERSION=0.0.6
 
 GO_VERSION?=1.22
 ci:: docker deps clean bin test pact
@@ -91,7 +91,7 @@ download_plugins:
 		fi; \
 		if [ -z $$SKIP_PLUGIN_AVRO ]; then\
 			if [ ! -f ~/.pact/plugins/avro-$(PLUGIN_PACT_AVRO_VERSION)/bin/pact-avro-plugin ]; then \
-				~/.pact/bin/pact-plugin-cli -y install https://github.com/austek/pact-avro-plugin/releases/tag/v$(PLUGIN_PACT_AVRO_VERSION); \
+				~/.pact/bin/pact-plugin-cli -y install https://github.com/you54f/pact-avro-plugin/releases/tag/v$(PLUGIN_PACT_AVRO_VERSION); \
 			else \
 				echo "--- 🐿  Pact avro-$(PLUGIN_PACT_AVRO_VERSION) already installed"; \
 			fi; \
