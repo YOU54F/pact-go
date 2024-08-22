@@ -347,8 +347,8 @@ func (i *Installer) checkMusl() error {
 	return err
 }
 
-// download template structure: "https://github.com/pact-foundation/pact-reference/releases/download/PACKAGE-vVERSION/LIBNAME-OS-ARCH.EXTENSION.gz"
-var downloadTemplate = "https://github.com/pact-foundation/pact-reference/releases/download/%s-v%s/%s-%s-%s.%s.gz"
+// download template structure: "https://github.com/you54f/pact-reference/releases/download/PACKAGE-vVERSION/LIBNAME-OS-ARCH.EXTENSION.gz"
+var downloadTemplate = "https://github.com/you54f/pact-reference/releases/download/%s-v%s/%s-%s-%s.%s.gz"
 
 var supportedOSes = map[string]string{
 	"darwin": macos,
@@ -387,7 +387,7 @@ const (
 var packages = map[string]packageInfo{
 	FFIPackage: {
 		libName:     "libpact_ffi",
-		version:     "0.4.22",
+		version:     "0.4.33",
 		semverRange: ">= 0.4.0, < 1.0.0",
 	},
 }

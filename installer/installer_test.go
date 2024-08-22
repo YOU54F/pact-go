@@ -37,7 +37,7 @@ func TestInstallerDownloader(t *testing.T) {
 			{
 				name: "ffi lib - linux x86",
 				pkg:  FFIPackage,
-				want: fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/libpact_ffi-v%s/libpact_ffi-linux-x86_64.so.gz", packages[FFIPackage].version),
+				want: fmt.Sprintf("https://github.com/you54f/pact-reference/releases/download/libpact_ffi-v%s/libpact_ffi-linux-x86_64.so.gz", packages[FFIPackage].version),
 				test: Installer{
 					os:   linux,
 					arch: x86_64,
@@ -46,7 +46,7 @@ func TestInstallerDownloader(t *testing.T) {
 			{
 				name: "ffi lib - macos x86",
 				pkg:  FFIPackage,
-				want: fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/libpact_ffi-v%s/libpact_ffi-macos-x86_64.dylib.gz", packages[FFIPackage].version),
+				want: fmt.Sprintf("https://github.com/you54f/pact-reference/releases/download/libpact_ffi-v%s/libpact_ffi-macos-x86_64.dylib.gz", packages[FFIPackage].version),
 				test: Installer{
 					os:   macos,
 					arch: x86_64,
@@ -55,7 +55,7 @@ func TestInstallerDownloader(t *testing.T) {
 			{
 				name: "ffi lib - macos arm64",
 				pkg:  FFIPackage,
-				want: fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/libpact_ffi-v%s/libpact_ffi-macos-aarch64.dylib.gz", packages[FFIPackage].version),
+				want: fmt.Sprintf("https://github.com/you54f/pact-reference/releases/download/libpact_ffi-v%s/libpact_ffi-macos-aarch64.dylib.gz", packages[FFIPackage].version),
 				test: Installer{
 					os:   macos,
 					arch: aarch64,
@@ -64,7 +64,7 @@ func TestInstallerDownloader(t *testing.T) {
 			{
 				name: "ffi lib - windows x86",
 				pkg:  FFIPackage,
-				want: fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/libpact_ffi-v%s/pact_ffi-windows-x86_64.dll.gz", packages[FFIPackage].version),
+				want: fmt.Sprintf("https://github.com/you54f/pact-reference/releases/download/libpact_ffi-v%s/pact_ffi-windows-x86_64.dll.gz", packages[FFIPackage].version),
 				test: Installer{
 					os:   windows,
 					arch: x86_64,
