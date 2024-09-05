@@ -1,4 +1,18 @@
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      log_level:
+        description: 'Log level'
+        type: choice
+        required: true
+        default: 'INFO'
+        options:
+          - 'INFO'
+          - 'DEBUG'
+          - 'TRACE'
+
 name: Test
 
 env:
@@ -9,7 +23,7 @@ env:
   APP_REF: ${{ github.ref }}
   PACT_GO_LIB_DOWNLOAD_PATH: /tmp
   PACT_LD_LIBRARY_PATH: /tmp
-  LOG_LEVEL: INFO
+  LOG_LEVEL: ${{ github.event.inputs.log_level || 'INFO' }}
   COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
