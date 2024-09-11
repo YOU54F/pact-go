@@ -106,12 +106,12 @@ install: bin
 	echo "--- 🐿 Installing Pact FFI dependencies"
 	./build/pact-go -l DEBUG install --libDir $(PACT_DOWNLOAD_DIR)
 
-pact: clean install docker
+pact: clean docker
 	@echo "--- 🔨 Running Pact examples"
 	go test -v -tags=consumer -count=1 github.com/pact-foundation/pact-go/v2/examples/...
 	make publish
 	go test -v -timeout=30s -tags=provider -count=1 github.com/pact-foundation/pact-go/v2/examples/...
-pact_local: clean download_plugins install 
+pact_local: clean download_plugins 
 	@echo "--- 🔨 Running Pact examples"
 	go test -v -tags=consumer -count=1 github.com/pact-foundation/pact-go/v2/examples/...
 	SKIP_PUBLISH=true go test -v -timeout=30s -tags=provider -count=1 github.com/pact-foundation/pact-go/v2/examples/...
@@ -124,7 +124,7 @@ release:
 	echo "--- 🚀 Releasing it"
 	"$(CURDIR)/scripts/release.sh"
 
-test: deps install
+test: deps
 	@echo "--- ✅ Running tests"
 	@if [ -f coverage.txt ]; then rm coverage.txt; fi;
 	@echo "mode: count" > coverage.txt
