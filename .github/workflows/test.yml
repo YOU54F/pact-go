@@ -8,7 +8,7 @@ env:
   APP_SHA: ${{ github.sha }}
   APP_REF: ${{ github.ref }}
   # LD_LIBRARY_PATH: /tmp
-  # PACT_GO_LIB_DOWNLOAD_PATH: /tmp
+  PACT_GO_LIB_DOWNLOAD_PATH: /tmp # left in for existing installer test
   LOG_LEVEL: debug
   COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
