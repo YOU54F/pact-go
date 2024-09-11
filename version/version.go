@@ -3,7 +3,7 @@ package version
 import (
 	"log"
 
-	"github.com/pact-foundation/pact-go/v2/internal/checker"
+	"github.com/you54f/pact-go/v2/internal/checker"
 )
 
 // CheckVersion checks if the currently installed version is within semver range

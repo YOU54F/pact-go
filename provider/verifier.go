@@ -12,13 +12,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pact-foundation/pact-go/v2/command"
-	"github.com/pact-foundation/pact-go/v2/internal/native"
-	logging "github.com/pact-foundation/pact-go/v2/log"
-	"github.com/pact-foundation/pact-go/v2/message"
-	"github.com/pact-foundation/pact-go/v2/models"
-	"github.com/pact-foundation/pact-go/v2/proxy"
-	"github.com/pact-foundation/pact-go/v2/utils"
+	"github.com/you54f/pact-go/v2/command"
+	"github.com/you54f/pact-go/v2/internal/native"
+	logging "github.com/you54f/pact-go/v2/log"
+	"github.com/you54f/pact-go/v2/message"
+	"github.com/you54f/pact-go/v2/models"
+	"github.com/you54f/pact-go/v2/proxy"
+	"github.com/you54f/pact-go/v2/utils"
 )
 
 const MESSAGE_PATH = "/__messages"

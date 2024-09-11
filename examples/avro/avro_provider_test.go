@@ -12,9 +12,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/provider"
-	"github.com/pact-foundation/pact-go/v2/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/you54f/pact-go/v2/provider"
+	"github.com/you54f/pact-go/v2/utils"
 )
 
 var dir, _ = os.Getwd()

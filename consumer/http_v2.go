@@ -4,9 +4,9 @@ import (
 	"log"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/matchers"
-	"github.com/pact-foundation/pact-go/v2/models"
-	"github.com/pact-foundation/pact-go/v2/utils"
+	"github.com/you54f/pact-go/v2/matchers"
+	"github.com/you54f/pact-go/v2/models"
+	"github.com/you54f/pact-go/v2/utils"
 )
 
 // V2HTTPMockProvider is the entrypoint for V2 http consumer tests

@@ -4,10 +4,10 @@ import (
 	"log"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/internal/native"
-	"github.com/pact-foundation/pact-go/v2/matchers"
-	"github.com/pact-foundation/pact-go/v2/models"
-	"github.com/pact-foundation/pact-go/v2/utils"
+	"github.com/you54f/pact-go/v2/internal/native"
+	"github.com/you54f/pact-go/v2/matchers"
+	"github.com/you54f/pact-go/v2/models"
+	"github.com/you54f/pact-go/v2/utils"
 )
 
 // V4HTTPMockProvider is the entrypoint for V4 http consumer tests

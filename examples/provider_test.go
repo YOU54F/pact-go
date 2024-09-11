@@ -12,12 +12,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/log"
-	"github.com/pact-foundation/pact-go/v2/message"
-	"github.com/pact-foundation/pact-go/v2/models"
-	"github.com/pact-foundation/pact-go/v2/provider"
-	"github.com/pact-foundation/pact-go/v2/version"
 	"github.com/stretchr/testify/assert"
+	"github.com/you54f/pact-go/v2/log"
+	"github.com/you54f/pact-go/v2/message"
+	"github.com/you54f/pact-go/v2/models"
+	"github.com/you54f/pact-go/v2/provider"
+	"github.com/you54f/pact-go/v2/version"
 )
 
 var dir, _ = os.Getwd()

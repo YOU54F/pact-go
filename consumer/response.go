@@ -1,6 +1,6 @@
 package consumer
 
-import "github.com/pact-foundation/pact-go/v2/matchers"
+import "github.com/you54f/pact-go/v2/matchers"
 
 // Response is the default implementation of the Response interface.
 type Response struct {

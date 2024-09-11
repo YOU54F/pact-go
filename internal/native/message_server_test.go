@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pact-foundation/pact-go/v2/log"
+	"github.com/you54f/pact-go/v2/log"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/stretchr/testify/assert"

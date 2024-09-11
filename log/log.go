@@ -72,7 +72,7 @@ var crashMessage = `!!!!!!!!! PACT CRASHED !!!!!!!!!
 %s
 
 This is almost certainly a bug in Pact Go. It would be great if you could
-open a bug report at: https://github.com/pact-foundation/pact-go/issues
+open a bug report at: https://github.com/you54f/pact-go/issues
 so that we can fix it.
 
 There is additional debugging information above. If you open a bug report, 

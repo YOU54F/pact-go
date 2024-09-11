@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/log"
 	"github.com/stretchr/testify/assert"
+	"github.com/you54f/pact-go/v2/log"
 )
 
 func TestSyncTypeSystem_NoPlugin(t *testing.T) {

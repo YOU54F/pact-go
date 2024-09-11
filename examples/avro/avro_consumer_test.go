@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/you54f/pact-go/v2/consumer"
 
 	"path/filepath"
 

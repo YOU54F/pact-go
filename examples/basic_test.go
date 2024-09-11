@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/consumer"
-	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
+	"github.com/you54f/pact-go/v2/consumer"
+	"github.com/you54f/pact-go/v2/matchers"
 )
 
 type S = matchers.S

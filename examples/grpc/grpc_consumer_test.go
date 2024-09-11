@@ -12,11 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pact-foundation/pact-go/v2/examples/grpc/routeguide"
-	"github.com/pact-foundation/pact-go/v2/log"
-	message "github.com/pact-foundation/pact-go/v2/message/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/you54f/pact-go/v2/examples/grpc/routeguide"
+	"github.com/you54f/pact-go/v2/log"
+	message "github.com/you54f/pact-go/v2/message/v4"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

@@ -1,6 +1,6 @@
 package consumer
 
-import "github.com/pact-foundation/pact-go/v2/matchers"
+import "github.com/you54f/pact-go/v2/matchers"
 
 // Request is the default implementation of the Request interface.
 type Request struct {

@@ -22,10 +22,10 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/pact-foundation/pact-go/v2/internal/native"
-	logging "github.com/pact-foundation/pact-go/v2/log"
-	"github.com/pact-foundation/pact-go/v2/models"
-	"github.com/pact-foundation/pact-go/v2/utils"
+	"github.com/you54f/pact-go/v2/internal/native"
+	logging "github.com/you54f/pact-go/v2/log"
+	"github.com/you54f/pact-go/v2/models"
+	"github.com/you54f/pact-go/v2/utils"
 )
 
 // MockHTTPProviderConfig provides the configuration options for an HTTP mock server

@@ -1,8 +1,8 @@
 package checker
 
 import (
-	"github.com/pact-foundation/pact-go/v2/installer"
-	"github.com/pact-foundation/pact-go/v2/internal/native"
+	"github.com/you54f/pact-go/v2/installer"
+	"github.com/you54f/pact-go/v2/internal/native"
 )
 
 func CheckInstall() error {

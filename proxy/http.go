@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pact-foundation/pact-go/v2/utils"
+	"github.com/you54f/pact-go/v2/utils"
 )
 
 // Middleware is a way to use composition to add functionality

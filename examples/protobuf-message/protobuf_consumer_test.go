@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	message "github.com/pact-foundation/pact-go/v2/message/v4"
 	"github.com/stretchr/testify/assert"
+	message "github.com/you54f/pact-go/v2/message/v4"
 )
 
 var dir, _ = os.Getwd()

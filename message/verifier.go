@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/pact-foundation/pact-go/v2/models"
-	"github.com/pact-foundation/pact-go/v2/proxy"
+	"github.com/you54f/pact-go/v2/models"
+	"github.com/you54f/pact-go/v2/proxy"
 )
 
 type messageVerificationHandlerRequest struct {

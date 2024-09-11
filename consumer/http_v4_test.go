@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
+	"github.com/you54f/pact-go/v2/matchers"
 )
 
 func TestHttpV4TypeSystem(t *testing.T) {

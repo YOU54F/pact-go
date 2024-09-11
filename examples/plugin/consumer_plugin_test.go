@@ -15,11 +15,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/consumer"
+	"github.com/you54f/pact-go/v2/consumer"
 
-	// "github.com/pact-foundation/pact-go/v2/matchers"
-	message "github.com/pact-foundation/pact-go/v2/message/v4"
+	// "github.com/you54f/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
+	message "github.com/you54f/pact-go/v2/message/v4"
 )
 
 var dir, _ = os.Getwd()

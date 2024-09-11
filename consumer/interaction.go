@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	mockserver "github.com/pact-foundation/pact-go/v2/internal/native"
-	"github.com/pact-foundation/pact-go/v2/matchers"
-	"github.com/pact-foundation/pact-go/v2/models"
+	mockserver "github.com/you54f/pact-go/v2/internal/native"
+	"github.com/you54f/pact-go/v2/matchers"
+	"github.com/you54f/pact-go/v2/models"
 )
 
 // Interaction is the main implementation of the Pact interface.

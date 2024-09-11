@@ -9,10 +9,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/internal/native"
-	mockserver "github.com/pact-foundation/pact-go/v2/internal/native"
-	logging "github.com/pact-foundation/pact-go/v2/log"
-	"github.com/pact-foundation/pact-go/v2/models"
+	"github.com/you54f/pact-go/v2/internal/native"
+	mockserver "github.com/you54f/pact-go/v2/internal/native"
+	logging "github.com/you54f/pact-go/v2/log"
+	"github.com/you54f/pact-go/v2/models"
 )
 
 // TODO: make a builder?
@@ -190,7 +190,6 @@ func (p *AsynchronousPact) AddAsynchronousMessage() *AsynchronousMessageBuilder 
 
 // VerifyMessageConsumerRaw creates a new Pact _message_ interaction to build a testable
 // interaction.
-//
 //
 // A Message Consumer is analagous to a Provider in the HTTP Interaction model.
 // It is the receiver of an interaction, and needs to be able to handle whatever

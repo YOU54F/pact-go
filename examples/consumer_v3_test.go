@@ -8,12 +8,12 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/consumer"
-	"github.com/pact-foundation/pact-go/v2/log"
-	"github.com/pact-foundation/pact-go/v2/matchers"
-	message "github.com/pact-foundation/pact-go/v2/message/v3"
-	"github.com/pact-foundation/pact-go/v2/models"
 	"github.com/stretchr/testify/assert"
+	"github.com/you54f/pact-go/v2/consumer"
+	"github.com/you54f/pact-go/v2/log"
+	"github.com/you54f/pact-go/v2/matchers"
+	message "github.com/you54f/pact-go/v2/message/v3"
+	"github.com/you54f/pact-go/v2/models"
 )
 
 var Decimal = matchers.Decimal

@@ -11,11 +11,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	pb "github.com/pact-foundation/pact-go/v2/examples/grpc/routeguide"
-	"github.com/pact-foundation/pact-go/v2/examples/grpc/routeguide/server"
-	l "github.com/pact-foundation/pact-go/v2/log"
-	"github.com/pact-foundation/pact-go/v2/provider"
 	"github.com/stretchr/testify/assert"
+	pb "github.com/you54f/pact-go/v2/examples/grpc/routeguide"
+	"github.com/you54f/pact-go/v2/examples/grpc/routeguide/server"
+	l "github.com/you54f/pact-go/v2/log"
+	"github.com/you54f/pact-go/v2/provider"
 	"google.golang.org/grpc"
 )
 

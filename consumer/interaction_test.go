@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/matchers"
-	"github.com/pact-foundation/pact-go/v2/models"
 	"github.com/stretchr/testify/assert"
+	"github.com/you54f/pact-go/v2/matchers"
+	"github.com/you54f/pact-go/v2/models"
 )
 
 func TestInteraction(t *testing.T) {

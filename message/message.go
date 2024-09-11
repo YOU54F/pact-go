@@ -1,7 +1,7 @@
 package message
 
 import (
-	"github.com/pact-foundation/pact-go/v2/models"
+	"github.com/you54f/pact-go/v2/models"
 )
 
 type Body interface{}

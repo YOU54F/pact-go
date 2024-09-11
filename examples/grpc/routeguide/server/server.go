@@ -37,14 +37,14 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/pact-foundation/pact-go/v2/examples/grpc/routeguide/data"
+	"github.com/you54f/pact-go/v2/examples/grpc/routeguide/data"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 
 	"github.com/golang/protobuf/proto"
 
-	pb "github.com/pact-foundation/pact-go/v2/examples/grpc/routeguide"
+	pb "github.com/you54f/pact-go/v2/examples/grpc/routeguide"
 )
 
 var (

@@ -7,10 +7,10 @@ package main
 import (
 	"testing"
 
-	"github.com/pact-foundation/pact-go/v2/consumer"
-	"github.com/pact-foundation/pact-go/v2/log"
-	"github.com/pact-foundation/pact-go/v2/models"
 	"github.com/stretchr/testify/assert"
+	"github.com/you54f/pact-go/v2/consumer"
+	"github.com/you54f/pact-go/v2/log"
+	"github.com/you54f/pact-go/v2/models"
 )
 
 func TestConsumerV4(t *testing.T) {

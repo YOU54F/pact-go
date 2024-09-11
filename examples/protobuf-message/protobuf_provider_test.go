@@ -10,13 +10,13 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/pact-foundation/pact-go/v2/examples/grpc/routeguide"
-	pactlog "github.com/pact-foundation/pact-go/v2/log"
-	"github.com/pact-foundation/pact-go/v2/message"
-	"github.com/pact-foundation/pact-go/v2/models"
-	"github.com/pact-foundation/pact-go/v2/provider"
-	pactversion "github.com/pact-foundation/pact-go/v2/version"
 	"github.com/stretchr/testify/assert"
+	"github.com/you54f/pact-go/v2/examples/grpc/routeguide"
+	pactlog "github.com/you54f/pact-go/v2/log"
+	"github.com/you54f/pact-go/v2/message"
+	"github.com/you54f/pact-go/v2/models"
+	"github.com/you54f/pact-go/v2/provider"
+	pactversion "github.com/you54f/pact-go/v2/version"
 )
 
 func TestPluginMessageProvider(t *testing.T) {
