@@ -62,7 +62,7 @@ bin:
 
 clean:
 	mkdir -p ./examples/pacts
-	rm -rf build output dist examples/pacts
+	rm -rf build output dist
 
 deps: download_plugins
 
