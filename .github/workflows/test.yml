@@ -46,7 +46,7 @@ jobs:
       - name: Add pact_ffi lib on PATH
         if: matrix.os == 'windows-latest'
         shell: bash
-        run: |
+        run: | # on windows something like $(go list -m -f '{{.Dir}}' github.com/you54f/pact-go/v2)/internal/native/libs/windows-x86_64
           echo "$PWD/internal/native/libs/windows-x86_64" >> $GITHUB_PATH
       - name: Test (unit)
         if: matrix.os != 'ubuntu-latest'
