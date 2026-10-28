@@ -85,6 +85,12 @@ type httpMockProvider struct {
 	specificationVersion models.SpecificationVersion
 	config               MockHTTPProviderConfig
 	mockserver           *native.MockServer
+
+	// running is true while the mock server for ExecuteTest is up.
+	running bool
+	// logs holds the mock server logs read so far for the most recent
+	// ExecuteTest.
+	logs strings.Builder
 }
 
 // MockServerConfig stores the address configuration details of the server for the current executing test
@@ -113,7 +119,9 @@ func (p *httpMockProvider) ExecuteTest(t *testing.T, integrationTest func(MockSe
 		return errors.New("error: unable to find free port, mock server will fail to start")
 	}
 
+	p.logs.Reset()
 	p.config.Port, err = p.mockserver.Start(fmt.Sprintf("%s:%d", p.config.Host, p.config.Port), p.config.TLS)
+	p.running = err == nil
 	defer p.reset()
 	if err != nil {
 		//nolint:wrapcheck // MockServer.Start returns the internal/native sentinels
@@ -147,6 +155,17 @@ func (p *httpMockProvider) ExecuteTest(t *testing.T, integrationTest func(MockSe
 	p.mockserver.CleanupPlugins()
 
 	return p.writePact()
+}
+
+// MockServerLogs returns the logs pact_ffi wrote for the mock server of the
+// most recent ExecuteTest, at the configured log level. It can be called from
+// within the integration test, or once ExecuteTest has returned.
+func (p *httpMockProvider) MockServerLogs() string {
+	if p.running {
+		p.logs.WriteString(p.mockserver.MockServerLogs(p.config.Port))
+	}
+
+	return p.logs.String()
 }
 
 // configure applies the defaults for any unset consumer test configuration.
@@ -185,6 +204,10 @@ func (p *httpMockProvider) configure() {
 
 // Clear state between tests.
 func (p *httpMockProvider) reset() {
+	if p.running {
+		p.logs.WriteString(p.mockserver.MockServerLogs(p.config.Port))
+		p.running = false
+	}
 	p.mockserver.CleanupMockServer(p.config.Port)
 	p.mockserver.CleanupPlugins()
 	p.config.Port = 0
