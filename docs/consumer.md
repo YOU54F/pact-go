@@ -104,6 +104,13 @@ _NOTE: Some matchers are only compatible with the V3 interface, and must not be 
 | `DateGenerated`                    | V3                 | Matches a cross platform formatted date, and generates a current date during verification                                                                                                                                                                   |
 | `TimeGenerated`                    | V3                 | Matches a cross platform formatted date, and generates a current time during verification                                                                                                                                                                   |
 | `DateTimeGenerated`                | V3                 | Matches a cross platform formatted datetime, and generates a current datetime during verification                                                                                                                                                           |
+| `Null{}`                           | V3                 | Matches only null values.                                                                                                                                                                                                                                   |
+| `AnyOf(matchers...)`               | V3                 | Matches if at least one of the matchers matches (rules combined with OR). The first matcher provides the example. See [Combining matchers with OR](#combining-matchers-with-or).                                                                            |
+| `OrNull(matcher)`                  | V3                 | Matches the given matcher, or null. Shorthand for `AnyOf(matcher, Null{})`.                                                                                                                                                                                 |
+| `LikeOrNull(content)`              | V3                 | Matches a value of the same type as `content`, or null.                                                                                                                                                                                                     |
+| `IntegerOrNull(example)`           | V3                 | Matches an integer, or null.                                                                                                                                                                                                                                |
+| `DecimalOrNull(example)`           | V3                 | Matches a decimal, or null.                                                                                                                                                                                                                                 |
+| `RegexOrNull(example, regex)`      | V3                 | Matches a string matching `regex`, or null.                                                                                                                                                                                                                 |
 
 #### Match common formats
 
@@ -119,6 +126,57 @@ _NOTE: Some matchers are only compatible with the V3 interface, and must not be 
 | `IPv4Address()` | V2                 | Match string containing IP4 formatted address                                                   |
 | `IPv6Address()` | V2                 | Match string containing IP6 formatted address                                                   |
 | `UUID()`        | V2                 | Match strings containing UUIDs                                                                  |
+
+#### Combining matchers with OR
+
+`AnyOf` lets several matchers apply to the same field, header or query parameter, so that a value matches if
+_any one_ of them matches. A common use is a value that may be `null`:
+
+```go
+	body := Map{
+		// "Fred", any other string, or null
+		"name": LikeOrNull("Fred"),
+		// digits, lower case letters, or null
+		"code": AnyOf(Regex("123", `^\d+$`), Regex("abc", `^[a-z]+$`), Null{}),
+		// null, or an object whose "number" is an integer
+		"address": LikeOrNull(map[string]any{
+			"street": Like("Main St"),
+			"number": Integer(42),
+		}),
+	}
+```
+
+Matchers nested in the example (like `number` above) still apply to its children when the value is not `null`.
+`AnyOf` also works for headers and query parameters, e.g.
+`Query("status", AnyOf(Regex("active", "^active$"), Regex("pending", "^pending$")))`.
+
+The `name` field is sent to pact_ffi as:
+
+```json
+{
+  "pact:matcher:type": [{ "pact:matcher:type": "type" }, { "pact:matcher:type": "null" }],
+  "pact:matcher:combine": "OR",
+  "value": "Fred"
+}
+```
+
+and is written to the pact file as `{"combine": "OR", "matchers": [{"match": "type"}, {"match": "null"}]}`.
+
+Things to be aware of:
+
+- **Only the example is exercised in the consumer test.** In a response, the mock server always returns the first
+  matcher's example, so your consumer code is never tested against the other alternatives (for example, how it
+  handles `null`). They are recorded in the pact and checked during provider verification. Consider a separate
+  interaction for each shape your consumer must actually handle.
+- Each alternative must be a matcher that describes a matching rule (`Like`, `Regex`, `Integer`, `Null{}`, ...),
+  not a plain `S`/`String` or a `StructMatcher`; otherwise marshalling the matcher fails.
+- Matchers like `Like` compare against the example, so `LikeOrNull` on an object accepts an object of the same
+  shape, or null.
+- Put all the alternatives in one `AnyOf` (nested `AnyOf`s are flattened for you). Don't wrap another matcher in the
+  example of an OR group: its rules would be replaced by the OR group.
+- Requires a version of pact_ffi that supports `pact:matcher:combine`
+  ([pact-foundation/pact-reference#601](https://github.com/pact-foundation/pact-reference/pull/601)),
+  i.e. pact_ffi `TODO: version`. Older versions do not understand `pact:matcher:combine`, so requests that should match will not.
 
 #### Nesting Matchers
 
