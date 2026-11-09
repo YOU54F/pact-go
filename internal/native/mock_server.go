@@ -6,6 +6,7 @@ package native
 import "C"
 
 import (
+	"bytes"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -103,20 +104,48 @@ func Init(logLevel string) {
 	}
 	log.Printf("[DEBUG] initialised native log level to %s (%d)", logLevel, l)
 
-	if os.Getenv("PACT_LOG_PATH") != "" {
-		log.Println("[DEBUG] initialised native log to log to file:", os.Getenv("PACT_LOG_PATH"))
-		err := logToFile(os.Getenv("PACT_LOG_PATH"), l)
-		if err != nil {
-			log.Println("[ERROR] failed to log to file:", err)
-		}
-		return
+	err := initLogger(l, os.Getenv("PACT_LOG_PATH"))
+	if err != nil {
+		log.Println("[ERROR] failed to initialise the native logger:", err)
+	}
+}
+
+// initLogger installs the pact_ffi logger. Logs go to stdout, or to path when
+// it is set, and are also kept in an in-memory buffer so that each mock
+// server's logs can be read back with MockServerLogs.
+func initLogger(level logLevel, path string) error {
+	C.pactffi_logger_init()
+
+	sink := "stdout"
+	if path != "" {
+		sink = "file " + path
+	}
+	log.Println("[DEBUG] initialised native log to log to", sink)
+
+	err := attachLogSink(sink, level)
+	if err != nil {
+		return err
 	}
 
-	log.Println("[DEBUG] initialised native log to log to stdout")
-	err := logToStdout(l)
+	err = attachLogSink("buffer", level)
 	if err != nil {
-		log.Println("[ERROR] failed to log to stdout:", err)
+		return err
 	}
+
+	res := C.pactffi_logger_apply()
+	log.Println("[DEBUG] logger_apply res", res)
+
+	return logResultToError(int(res))
+}
+
+func attachLogSink(sink string, level logLevel) error {
+	cSink := C.CString(sink)
+	defer free(cSink)
+
+	res := C.pactffi_logger_attach_sink(cSink, C.int(level))
+	log.Println("[DEBUG] logger_attach_sink", sink, "res", res)
+
+	return logResultToError(int(res))
 }
 
 // MockServer is the public interface for managing the HTTP mock server.
@@ -179,12 +208,32 @@ func (m *MockServer) MockServerMismatchedRequests(port int) []MismatchedRequest 
 	return res
 }
 
+// MockServerLogs returns the logs the mock server on port has written since
+// they were last read, and removes them from the buffer. It returns an empty
+// string if there is no mock server on port.
+func (m *MockServer) MockServerLogs(port int) string {
+	// The returned string is owned by the mock server and freed by
+	// pactffi_cleanup_mock_server.
+	logs := C.pactffi_mock_server_logs(C.int(port))
+	if logs == nil {
+		return ""
+	}
+
+	return C.GoString(logs)
+}
+
 // CleanupMockServer frees the memory from the previous mock server.
 func (m *MockServer) CleanupMockServer(port int) bool {
 	if len(m.interactions) == 0 {
 		return true
 	}
 	log.Println("[DEBUG] mock server cleaning up port:", port)
+
+	// pact_ffi keeps buffered logs until they are read. Callers read the mock
+	// server's own logs with MockServerLogs before cleaning up; the logs written
+	// outside any mock server are not read, so drop them here.
+	drainGlobalLogBuffer()
+
 	res := C.pactffi_cleanup_mock_server(C.int(port))
 
 	return bool(res)
@@ -676,74 +725,47 @@ type stringLike interface {
 	String() string
 }
 
+// stringFromInterface converts obj into the string form pact_ffi expects.
+//
+// Strings are passed through as given. Anything else is JSON-encoded, without
+// HTML escaping, so '<', '>' and '&' reach pact_ffi as written. If the encoding
+// is a JSON string (e.g. matchers.S or matchers.String, which are really just
+// strings), it is decoded again so that pact_ffi receives the plain value
+// rather than a quoted and escaped one.
 func stringFromInterface(obj any) string {
 	switch t := obj.(type) {
 	case string:
 		return t
 	default:
-		bytes, err := json.Marshal(obj)
+		var buf bytes.Buffer
+		enc := json.NewEncoder(&buf)
+		enc.SetEscapeHTML(false)
+		err := enc.Encode(obj)
 		if err != nil {
 			panic(fmt.Sprintln("unable to marshal body to JSON:", err))
 		}
-		return quotedString(string(bytes))
+		encoded := bytes.TrimSuffix(buf.Bytes(), []byte("\n"))
+
+		// Only a JSON string is decoded; json.Unmarshal would also accept
+		// null into a string, which must stay "null".
+		var s string
+		if len(encoded) > 0 && encoded[0] == '"' && json.Unmarshal(encoded, &s) == nil {
+			return s
+		}
+
+		return string(encoded)
 	}
 }
 
-// This fixes a quirk where certain "matchers" (e.g. matchers.S/String) are
-// really just strings. However, whene we JSON encode them they get wrapped in quotes
-// and the rust core sees them as plain strings, requiring then the quotes to be matched.
-func quotedString(s string) string {
-	if s[0] == '"' && s[len(s)-1] == '"' {
-		return s[1 : len(s)-1]
+// drainGlobalLogBuffer empties the in-memory log buffer that collects logs
+// written outside a mock server (e.g. while an interaction is being built),
+// which nothing in pact-go reads.
+func drainGlobalLogBuffer() {
+	buf := C.pactffi_fetch_log_buffer(nil)
+	if buf != nil {
+		C.pactffi_string_delete(buf)
 	}
-	return s
 }
-
-// Experimental logging options
-// func LogMessage(pkg, level, message string) {
-// 	cPkg := C.CString(pkg)
-// 	defer free(cPkg)
-
-// 	cLevel := C.CString(level)
-// 	defer free(cLevel)
-
-// 	cMessage := C.CString(message)
-// 	defer free(cMessage)
-
-// 	res := C.pactffi_log_message(cPkg, cLevel, cMessage)
-// 	log.Println("[DEBUG] log_to_buffer res", res)
-// }
-
-// func logToBuffer(level logLevel) error {
-// 	res := C.pactffi_log_to_buffer(C.int(level))
-// 	log.Println("[DEBUG] log_to_buffer res", res)
-
-// 	return logResultToError(int(res))
-// }
-
-func logToStdout(level logLevel) error {
-	res := C.pactffi_log_to_stdout(C.int(level))
-	log.Println("[DEBUG] log_to_stdout res", res)
-
-	return logResultToError(int(res))
-}
-
-func logToFile(file string, level logLevel) error {
-	cFile := C.CString(file)
-	defer free(cFile)
-
-	res := C.pactffi_log_to_file(cFile, C.int(level))
-	log.Println("[DEBUG] log_to_file res", res)
-
-	return logResultToError(int(res))
-}
-
-// func getLogBuffer() string {
-// 	buf := C.pactffi_fetch_log_buffer()
-// 	defer free(buf)
-
-// 	return C.GoString(buf)
-// }
 
 func logResultToError(res int) error {
 	switch res {

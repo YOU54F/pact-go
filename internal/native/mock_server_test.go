@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/pact-foundation/pact-go/v2/log"
+	"github.com/pact-foundation/pact-go/v2/matchers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
@@ -284,4 +285,39 @@ func TestPluginInteraction(t *testing.T) {
 
 	err = m.WritePactFile(port, tmpPactFolder)
 	assert.NoError(t, err)
+}
+
+func TestStringFromInterface(t *testing.T) {
+	link := `<https://a.example/x,y>; rel="a" & more`
+
+	tests := []struct {
+		name string
+		in   any
+		want string
+	}{
+		{name: "plain string", in: link, want: link},
+		{name: "matchers.S", in: matchers.S(link), want: link},
+		{name: "matchers.String", in: matchers.String(link), want: link},
+		{name: "matchers.S with a backslash", in: matchers.S(`a\b`), want: `a\b`},
+		{name: "empty matchers.S", in: matchers.S(""), want: ""},
+		{name: "number", in: 42, want: "42"},
+		{name: "bool", in: true, want: "true"},
+		{name: "nil", in: nil, want: "null"},
+		{
+			name: "map",
+			in:   map[string]any{"a": "<b> & c"},
+			want: `{"a":"<b> & c"}`,
+		},
+		{
+			name: "regex matcher",
+			in:   matchers.Regex("first-1", `^first-\d+$`),
+			want: `{"pact:matcher:type":"regex","value":"first-1","regex":"^first-\\d+$"}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, stringFromInterface(tt.in))
+		})
+	}
 }

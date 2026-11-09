@@ -49,9 +49,9 @@ func TestInstallerDownloader(t *testing.T) {
 				pkg:  FFIPackage,
 				want: func() string {
 					if checkMusl() {
-						return fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-x86_64-unknown-linux-musl.tar.xz", packages[FFIPackage].version)
+						return fmt.Sprintf("https://github.com/YOU54F/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-x86_64-unknown-linux-musl.tar.xz", packages[FFIPackage].version)
 					}
-					return fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-x86_64-unknown-linux-gnu.tar.xz", packages[FFIPackage].version)
+					return fmt.Sprintf("https://github.com/YOU54F/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-x86_64-unknown-linux-gnu.tar.xz", packages[FFIPackage].version)
 				}(),
 				test: Installer{
 					os:   linux,
@@ -63,9 +63,9 @@ func TestInstallerDownloader(t *testing.T) {
 				pkg:  FFIPackage,
 				want: func() string {
 					if checkMusl() {
-						return fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-aarch64-unknown-linux-musl.tar.xz", packages[FFIPackage].version)
+						return fmt.Sprintf("https://github.com/YOU54F/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-aarch64-unknown-linux-musl.tar.xz", packages[FFIPackage].version)
 					}
-					return fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-aarch64-unknown-linux-gnu.tar.xz", packages[FFIPackage].version)
+					return fmt.Sprintf("https://github.com/YOU54F/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-aarch64-unknown-linux-gnu.tar.xz", packages[FFIPackage].version)
 				}(),
 				test: Installer{
 					os:   linux,
@@ -75,7 +75,7 @@ func TestInstallerDownloader(t *testing.T) {
 			{
 				name: "ffi lib - macos x86_64",
 				pkg:  FFIPackage,
-				want: fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-x86_64-apple-darwin.tar.xz", packages[FFIPackage].version),
+				want: fmt.Sprintf("https://github.com/YOU54F/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-x86_64-apple-darwin.tar.xz", packages[FFIPackage].version),
 				test: Installer{
 					os:   macos,
 					arch: x86_64,
@@ -84,7 +84,7 @@ func TestInstallerDownloader(t *testing.T) {
 			{
 				name: "ffi lib - macos arm64",
 				pkg:  FFIPackage,
-				want: fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-aarch64-apple-darwin.tar.xz", packages[FFIPackage].version),
+				want: fmt.Sprintf("https://github.com/YOU54F/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-aarch64-apple-darwin.tar.xz", packages[FFIPackage].version),
 				test: Installer{
 					os:   macos,
 					arch: aarch64,
@@ -93,7 +93,7 @@ func TestInstallerDownloader(t *testing.T) {
 			{
 				name: "ffi lib - windows aarch64",
 				pkg:  FFIPackage,
-				want: fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-aarch64-pc-windows-msvc.zip", packages[FFIPackage].version),
+				want: fmt.Sprintf("https://github.com/YOU54F/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-aarch64-pc-windows-msvc.zip", packages[FFIPackage].version),
 				test: Installer{
 					os:   windows,
 					arch: aarch64,
@@ -102,7 +102,7 @@ func TestInstallerDownloader(t *testing.T) {
 			{
 				name: "ffi lib - windows x86_64",
 				pkg:  FFIPackage,
-				want: fmt.Sprintf("https://github.com/pact-foundation/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-x86_64-pc-windows-msvc.zip", packages[FFIPackage].version),
+				want: fmt.Sprintf("https://github.com/YOU54F/pact-reference/releases/download/pact_ffi-v%s/pact_ffi-x86_64-pc-windows-msvc.zip", packages[FFIPackage].version),
 				test: Installer{
 					os:   windows,
 					arch: x86_64,
