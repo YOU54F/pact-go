@@ -40,7 +40,7 @@ const rfc9110WarningText = "RFC 9110 §5.3"
 func repeatedHeaderCases() []repeatedHeaderCase {
 	linkA := `<https://a.example/x,y>; rel="a"`
 	linkB := `<https://b.example/>; rel="b"`
-	warns, noWarning := true, false
+	noWarning := false
 
 	return []repeatedHeaderCase{
 		{
@@ -87,14 +87,15 @@ func repeatedHeaderCases() []repeatedHeaderCase {
 			rfc9110Warning: &noWarning,
 		},
 		{
-			// This only matches when the field lines are compared one at a time,
-			// which pact-reference#584 deprecates with a warning.
-			name:           "H6b quoted value only matching line by line",
+			// Whitespace inside a quoted-string is literal (RFC 9110 §5.6.4), so
+			// "x, y" never equals "x , y", line by line or joined, and no
+			// pact-reference#584 deprecation warning is logged.
+			name:           "H6b quoted value whitespace is literal",
 			header:         "X-Request",
 			expected:       []matchers.Matcher{S(`"x , y"`), S("z")},
 			lines:          []string{`"x, y"`, "z"},
-			match:          true,
-			rfc9110Warning: &warns,
+			match:          false,
+			rfc9110Warning: &noWarning,
 		},
 		{
 			name:     "H8a Link values with a comma in the URI on separate lines",
