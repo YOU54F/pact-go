@@ -377,8 +377,8 @@ func checkMusl() bool {
 	return false
 }
 
-// download template structure: "https://github.com/pact-foundation/pact-reference/releases/download/RELEASE-vVERSION/RELEASE-TARGET.ARCHIVE_EXTENSION"
-var downloadTemplate = "https://github.com/pact-foundation/pact-reference/releases/download/%s-v%s/%s-%s.%s"
+// download template structure: "https://github.com/YOU54F/pact-reference/releases/download/RELEASE-vVERSION/RELEASE-TARGET.ARCHIVE_EXTENSION"
+var downloadTemplate = "https://github.com/YOU54F/pact-reference/releases/download/%s-v%s/%s-%s.%s"
 
 var supportedOSes = map[string]string{
 	"darwin": macos,
@@ -435,14 +435,14 @@ var packages = map[string]packageInfo{
 	FFIPackage: {
 		libName:     ffiLibBaseName,
 		releaseName: "pact_ffi",
-		version:     "0.5.12",
+		version:     "0.5.13-or.1",
 		// Pin to the shipped FFI minor. The bindings in this release reference
 		// symbols specific to this libpact_ffi minor, and past minors have both
 		// added and removed symbols, so a wider range lets a mismatched-but-in-range
 		// library already on disk pass CheckPackageInstall and skip reinstalling,
 		// which then fails at link/load time with undefined FFI symbols. Bump this
 		// in lockstep with version above.
-		semverRange: ">= 0.5.12, < 0.6.0",
+		semverRange: ">= 0.5.13-or.1", // hashicorp go-version rejects a prerelease against "< 0.6.0"
 	},
 }
 
