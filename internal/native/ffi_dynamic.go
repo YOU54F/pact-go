@@ -90,7 +90,7 @@ var (
 )
 
 func pactffi_with_multipart_file(interaction uint32, part int32, contentType string, file string, partName string) {
-	if runtime.GOOS != "windows" {
+	if runtime.GOOS != goosWindows {
 		withMultipartFileRegs(interaction, part, contentType, file, partName)
 
 		return
@@ -176,7 +176,7 @@ func ffiSymbols() []ffiSymbol {
 		{"pactffi_verifier_json", &pactffi_verifier_json},
 	}
 
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == goosWindows {
 		return append(symbols, ffiSymbol{"pactffi_with_multipart_file", &withMultipartFileMem})
 	}
 
@@ -185,6 +185,9 @@ func ffiSymbols() []ffiSymbol {
 
 // libEnvVar names a directory to load the pact_ffi library from, ahead of
 // the default locations.
+// goosWindows is the runtime.GOOS value on Windows.
+const goosWindows = "windows"
+
 const libEnvVar = "PACT_LD_LIBRARY_PATH"
 
 // libDownloadEnvVar names the directory `pact-go install` downloads the
@@ -204,7 +207,7 @@ func LibraryLoadError() error {
 
 func libFileName() string {
 	switch runtime.GOOS {
-	case "windows":
+	case goosWindows:
 		return "pact_ffi.dll"
 	case "darwin":
 		return "libpact_ffi.dylib"
@@ -226,7 +229,7 @@ func libCandidates() []string {
 			candidates = append(candidates, filepath.Join(dir, name))
 		}
 	}
-	if runtime.GOOS != "windows" {
+	if runtime.GOOS != goosWindows {
 		for _, dir := range []string{"/tmp", "/opt/pact/lib", "/usr/local/lib"} {
 			candidates = append(candidates, filepath.Join(dir, name))
 		}
@@ -262,7 +265,8 @@ func loadLibrary(symbols []ffiSymbol) error {
 	var errs []error
 	for _, path := range libCandidates() {
 		if filepath.IsAbs(path) {
-			if _, err := os.Stat(path); err != nil {
+			_, err := os.Stat(path)
+			if err != nil {
 				continue
 			}
 		}

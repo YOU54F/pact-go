@@ -1,6 +1,5 @@
 //go:build cgo && !pact_purego && !pact_goffi
 
-// Package native contains the c bindings into the Pact Reference types.
 package native
 
 /*

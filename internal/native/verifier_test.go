@@ -50,14 +50,14 @@ func TestVerifier_SetConsumerFilters(_ *testing.T) {
 
 func TestStringArrayToCStringArray(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
-		array, release := stringArrayToCStringArray(nil)
+		array, release := cStringArray(nil)
 		assert.Nil(t, array)
 		assert.NotNil(t, release)
 		release()
 	})
 
 	t.Run("values", func(t *testing.T) {
-		array, release := stringArrayToCStringArray([]string{"consumer1", "consumer2"})
+		array, release := cStringArray([]string{"consumer1", "consumer2"})
 		assert.NotNil(t, array)
 		assert.NotNil(t, release)
 		release()

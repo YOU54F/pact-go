@@ -21,7 +21,7 @@ func bindLibrary(path string, symbols []ffiSymbol) error {
 
 	// RegisterLibFunc panics on a missing symbol, so check them all first.
 	for _, s := range symbols {
-		_, err := purego.Dlsym(lib, s.name)
+		err := lookupSymbol(lib, s.name)
 		if err != nil {
 			return fmt.Errorf("symbol %s: %w", s.name, err)
 		}

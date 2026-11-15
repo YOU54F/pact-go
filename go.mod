@@ -17,6 +17,7 @@ require (
 
 require (
 	github.com/ebitengine/purego v0.11.3
+	github.com/go-webgpu/goffi v0.6.8
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/pretty v0.3.0 // indirect

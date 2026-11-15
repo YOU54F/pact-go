@@ -1,3 +1,5 @@
+// Package native contains the bindings into the Pact Reference (pact_ffi)
+// library.
 package native
 
 import "unsafe"
@@ -26,7 +28,7 @@ import "unsafe"
 //	unsigned short           uint16
 //	size_t                   uintptr
 //	unsigned char            uint8
-//	bool                     bool
+//	bool (stdbool.h)         bool
 
 // goString copies the NUL-terminated C string at p into a Go string. It
 // returns "" if p is nil. The C string is not freed.

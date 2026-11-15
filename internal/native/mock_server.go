@@ -117,7 +117,6 @@ func Init(logLevel string) {
 // MockServer is the public interface for managing the HTTP mock server.
 type MockServer struct {
 	pact         *Pact
-	messagePact  *MessagePact
 	interactions []*Interaction
 }
 
@@ -571,10 +570,6 @@ func (i *Interaction) withMultipartFile(contentType string, filename string, mim
 	return i
 }
 
-type stringLike interface {
-	String() string
-}
-
 func stringFromInterface(obj any) string {
 	switch t := obj.(type) {
 	case string:
@@ -629,7 +624,7 @@ func logToStdout(level logLevel) error {
 
 func logToFile(file string, level logLevel) error {
 	res := pactffi_log_to_file(file, int32(level))
-	log.Println("[DEBUG] log_to_file res", res)
+	log.Println("[DEBUG] log_to_file res", res) // #nosec G706 -- res is an integer result code
 
 	return logResultToError(int(res))
 }
