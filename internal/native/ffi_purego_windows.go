@@ -17,11 +17,11 @@ func openLibrary(path string) (uintptr, error) {
 	return uintptr(handle), nil
 }
 
-func lookupSymbol(lib uintptr, name string) error {
-	_, err := windows.GetProcAddress(windows.Handle(lib), name)
+func lookupSymbol(lib uintptr, name string) (uintptr, error) {
+	addr, err := windows.GetProcAddress(windows.Handle(lib), name)
 	if err != nil {
-		return fmt.Errorf("lookup %s: %w", name, err)
+		return 0, fmt.Errorf("lookup %s: %w", name, err)
 	}
 
-	return nil
+	return addr, nil
 }

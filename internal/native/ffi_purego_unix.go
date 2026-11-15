@@ -17,11 +17,11 @@ func openLibrary(path string) (uintptr, error) {
 	return lib, nil
 }
 
-func lookupSymbol(lib uintptr, name string) error {
-	_, err := purego.Dlsym(lib, name)
+func lookupSymbol(lib uintptr, name string) (uintptr, error) {
+	addr, err := purego.Dlsym(lib, name)
 	if err != nil {
-		return fmt.Errorf("dlsym: %w", err)
+		return 0, fmt.Errorf("dlsym: %w", err)
 	}
 
-	return nil
+	return addr, nil
 }

@@ -20,13 +20,19 @@ func bindLibrary(path string, symbols []ffiSymbol) error {
 	}
 
 	// RegisterLibFunc panics on a missing symbol, so check them all first.
-	for _, s := range symbols {
-		err := lookupSymbol(lib, s.name)
+	addrs := make([]uintptr, len(symbols))
+	for i, s := range symbols {
+		addrs[i], err = lookupSymbol(lib, s.name)
 		if err != nil {
 			return fmt.Errorf("symbol %s: %w", s.name, err)
 		}
 	}
-	for _, s := range symbols {
+	for i, s := range symbols {
+		if addr, ok := s.fptr.(*uintptr); ok {
+			*addr = addrs[i]
+
+			continue
+		}
 		purego.RegisterLibFunc(s.fptr, lib, s.name)
 	}
 

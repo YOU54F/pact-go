@@ -4,7 +4,41 @@ package native
 
 /*
 #include <stdlib.h>
+#include <stdint.h>
 #include "pact.h"
+
+// pact_go_verifier_execute calls pactffi_verifier_execute on a thread with
+// an 8 MiB stack, see ffi_verifier_thread.go for why.
+#if defined(__linux__)
+#include <pthread.h>
+
+static void *pact_go_verifier_thread(void *handle) {
+	return (void *)(intptr_t)pactffi_verifier_execute((struct VerifierHandle *)handle);
+}
+
+static int pact_go_verifier_execute(struct VerifierHandle *handle) {
+	pthread_attr_t attr;
+	pthread_t thread;
+	void *result = NULL;
+
+	if (pthread_attr_init(&attr) != 0) {
+		return pactffi_verifier_execute(handle);
+	}
+	if (pthread_attr_setstacksize(&attr, 8 * 1024 * 1024) != 0 ||
+			pthread_create(&thread, &attr, pact_go_verifier_thread, handle) != 0) {
+		pthread_attr_destroy(&attr);
+		return pactffi_verifier_execute(handle);
+	}
+	pthread_attr_destroy(&attr);
+	pthread_join(thread, &result);
+
+	return (int)(intptr_t)result;
+}
+#else
+static int pact_go_verifier_execute(struct VerifierHandle *handle) {
+	return pactffi_verifier_execute(handle);
+}
+#endif
 */
 import "C"
 
@@ -435,7 +469,7 @@ func pactffi_verifier_set_publish_options(handle unsafe.Pointer, providerVersion
 }
 
 func pactffi_verifier_execute(handle unsafe.Pointer) int32 {
-	return int32(C.pactffi_verifier_execute((*C.struct_VerifierHandle)(handle)))
+	return int32(C.pact_go_verifier_execute((*C.struct_VerifierHandle)(handle)))
 }
 
 func pactffi_verifier_set_no_pacts_is_error(handle unsafe.Pointer, isError uint8) int32 {

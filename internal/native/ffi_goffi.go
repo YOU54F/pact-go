@@ -33,6 +33,12 @@ func bindLibrary(path string, symbols []ffiSymbol) error {
 			return fmt.Errorf("symbol %s: %w", s.name, err)
 		}
 
+		if _, ok := s.fptr.(*uintptr); ok {
+			bound[i] = reflect.ValueOf(uintptr(addr))
+
+			continue
+		}
+
 		bound[i], err = goffiFunc(reflect.TypeOf(s.fptr).Elem(), addr)
 		if err != nil {
 			return fmt.Errorf("symbol %s: %w", s.name, err)

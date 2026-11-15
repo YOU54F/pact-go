@@ -101,7 +101,8 @@ func pactffi_with_multipart_file(interaction uint32, part int32, contentType str
 }
 
 // ffiSymbol pairs the name of a pact_ffi function with a pointer to the Go
-// func variable it is bound to.
+// func variable it is bound to. If fptr is a *uintptr instead, the symbol
+// is not bound: its address is stored there.
 type ffiSymbol struct {
 	name string
 	fptr any
@@ -176,6 +177,8 @@ func ffiSymbols() []ffiSymbol {
 		{"pactffi_verifier_json", &pactffi_verifier_json},
 	}
 
+	symbols = append(symbols, verifierThreadSymbols()...)
+
 	if runtime.GOOS == goosWindows {
 		return append(symbols, ffiSymbol{"pactffi_with_multipart_file", &withMultipartFileMem})
 	}
@@ -247,12 +250,17 @@ func init() {
 
 	errLibNotLoaded = loadLibrary(symbols)
 	if errLibNotLoaded == nil {
+		useVerifierThread()
+
 		return
 	}
 
 	errLibNotLoaded = fmt.Errorf("pact-go: the pact_ffi library is not available to the %s backend (run `pact-go install`, or set %s to the directory containing %s): %w", ffiBackend, libEnvVar, libFileName(), errLibNotLoaded)
 	for _, s := range symbols {
 		fn := reflect.ValueOf(s.fptr).Elem()
+		if fn.Kind() != reflect.Func {
+			continue
+		}
 		fn.Set(reflect.MakeFunc(fn.Type(), func([]reflect.Value) []reflect.Value {
 			panic(errLibNotLoaded)
 		}))
