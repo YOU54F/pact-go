@@ -94,6 +94,27 @@ func (i *Installer) SetLibDir(dir string) {
 	i.libDir = dir
 }
 
+// SetConfigLibDir records dir in the pact-go configuration file as the
+// directory the libraries were installed to, for `pact-go test` to use.
+func (i *Installer) SetConfigLibDir(dir string) error {
+	log.Printf("[DEBUG] setting config lib dir to %s", dir)
+	c := i.config.readConfig()
+	c.LibDir = dir
+
+	return i.config.writeConfig(c)
+}
+
+// GetConfigLibDir returns the directory the libraries were last installed
+// to, as recorded in the pact-go configuration file, or "" if none is.
+func GetConfigLibDir() string {
+	return configuration{}.readConfig().LibDir
+}
+
+// GetActualLibDir returns the directory the libraries are installed to.
+func (i *Installer) GetActualLibDir() string {
+	return i.getLibDir()
+}
+
 // Force installs over the top.
 func (i *Installer) Force(force bool) {
 	i.force = force
@@ -746,6 +767,7 @@ type packageMetadata struct {
 
 type pactConfig struct {
 	Libraries map[string]packageMetadata `yaml:"libraries"`
+	LibDir    string                     `yaml:"libDir,omitempty"`
 }
 
 type configReader interface {

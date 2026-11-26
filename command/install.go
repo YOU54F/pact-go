@@ -38,6 +38,12 @@ var (
 				log.Println("[ERROR] Your Pact library installation is out of date and we were unable to download a newer one for you:", err)
 				os.Exit(1)
 			}
+
+			// Record where the libraries are, for `pact-go test`.
+			err = i.SetConfigLibDir(i.GetActualLibDir())
+			if err != nil {
+				log.Println("[WARN] unable to record the library directory in the pact-go config:", err)
+			}
 		},
 	}
 )

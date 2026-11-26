@@ -1,10 +1,5 @@
 package native
 
-/*
-#include "pact.h"
-*/
-import "C"
-
 import (
 	"encoding/json"
 	"errors"
@@ -17,7 +12,7 @@ import (
 // Verifier is a Go representation of the pact_ffi VerifierHandle, used to
 // verify a provider against one or more consumer pacts.
 type Verifier struct {
-	handle *C.VerifierHandle
+	handle unsafe.Pointer
 }
 
 // NewVerifier creates a new provider verifier, identifying the calling
@@ -25,12 +20,7 @@ type Verifier struct {
 // and this module's own version). The caller is responsible for calling
 // Shutdown when done with it, to free the underlying resources.
 func NewVerifier(name string, version string) *Verifier {
-	cName := C.CString(name)
-	cVersion := C.CString(version)
-	defer free(cName)
-	defer free(cVersion)
-
-	h := C.pactffi_verifier_new_for_application(cName, cVersion)
+	h := pactffi_verifier_new_for_application(name, version)
 
 	return &Verifier{
 		handle: h,
@@ -60,50 +50,27 @@ var (
 
 // Shutdown releases the resources held by this verifier.
 func (v *Verifier) Shutdown() {
-	C.pactffi_verifier_shutdown(v.handle)
+	pactffi_verifier_shutdown(v.handle)
 }
 
 // SetProviderInfo sets the name and network location of the provider
 // under verification.
 func (v *Verifier) SetProviderInfo(name string, scheme string, host string, port uint16, path string) {
-	cName := C.CString(name)
-	defer free(cName)
-	cScheme := C.CString(scheme)
-	defer free(cScheme)
-	cHost := C.CString(host)
-	defer free(cHost)
-	cPort := C.ushort(port)
-	cPath := C.CString(path)
-	defer free(cPath)
-
-	C.pactffi_verifier_set_provider_info(v.handle, cName, cScheme, cHost, cPort, cPath)
+	pactffi_verifier_set_provider_info(v.handle, name, scheme, host, port, path)
 }
 
 // AddTransport registers an additional transport (e.g. a message queue
 // alongside HTTP) that the provider exposes for verification.
 func (v *Verifier) AddTransport(protocol string, port uint16, path string, scheme string) {
 	log.Println("[DEBUG] Adding transport with protocol:", protocol, "port:", port, "path:", path, "scheme:", scheme)
-	cProtocol := C.CString(protocol)
-	defer free(cProtocol)
-	cPort := C.ushort(port)
-	cPath := C.CString(path)
-	defer free(cPath)
-	cScheme := C.CString(scheme)
-	defer free(cScheme)
-
-	C.pactffi_verifier_add_provider_transport(v.handle, cProtocol, cPort, cPath, cScheme)
+	pactffi_verifier_add_provider_transport(v.handle, protocol, port, path, scheme)
 }
 
 // SetFilterInfo restricts verification to interactions matching
 // description and/or state; noState additionally restricts to
 // interactions with no provider state.
 func (v *Verifier) SetFilterInfo(description string, state string, noState bool) {
-	cFilterDescription := C.CString(description)
-	defer free(cFilterDescription)
-	cFilterState := C.CString(state)
-	defer free(cFilterState)
-
-	C.pactffi_verifier_set_filter_info(v.handle, cFilterDescription, cFilterState, boolToCUchar(noState))
+	pactffi_verifier_set_filter_info(v.handle, description, state, boolToCUchar(noState))
 }
 
 // SetProviderState sets the URL the verifier calls to set up (and, if
@@ -111,17 +78,14 @@ func (v *Verifier) SetFilterInfo(description string, state string, noState bool)
 // If body is set, state parameters are sent as a JSON request body rather
 // than query parameters.
 func (v *Verifier) SetProviderState(url string, teardown bool, body bool) {
-	cURL := C.CString(url)
-	defer free(cURL)
-
-	C.pactffi_verifier_set_provider_state(v.handle, cURL, boolToCUchar(teardown), boolToCUchar(body))
+	pactffi_verifier_set_provider_state(v.handle, url, boolToCUchar(teardown), boolToCUchar(body))
 }
 
 // SetVerificationOptions sets the options used by the verifier when
 // calling the provider.
 func (v *Verifier) SetVerificationOptions(disableSSLVerification bool, requestTimeout int64) {
 	// TODO: this returns an int and therefore can error. We should have all of these functions return values??
-	C.pactffi_verifier_set_verification_options(v.handle, boolToCUchar(disableSSLVerification), C.ulong(requestTimeout))
+	pactffi_verifier_set_verification_options(v.handle, boolToCUchar(disableSSLVerification), uint64(requestTimeout))
 }
 
 // SetConsumerFilters is intended to restrict verification to pacts from
@@ -129,53 +93,33 @@ func (v *Verifier) SetVerificationOptions(disableSSLVerification bool, requestTi
 func (v *Verifier) SetConsumerFilters(consumers []string) {
 	// TODO: check if this actually works! It is untested and its effect
 	// on the underlying pact_ffi call has not been confirmed.
-	cConsumers, freeConsumers := stringArrayToCStringArray(consumers)
+	cConsumers, freeConsumers := cStringArray(consumers)
 	defer freeConsumers()
-	C.pactffi_verifier_set_consumer_filters(v.handle, cConsumers, C.ushort(len(consumers)))
+	pactffi_verifier_set_consumer_filters(v.handle, cConsumers, uint16(len(consumers)))
 }
 
 // AddCustomHeader adds a header to be sent with every request made to the
 // provider during verification.
 func (v *Verifier) AddCustomHeader(name string, value string) {
-	cHeaderName := C.CString(name)
-	defer free(cHeaderName)
-	cHeaderValue := C.CString(value)
-	defer free(cHeaderValue)
-
-	C.pactffi_verifier_add_custom_header(v.handle, cHeaderName, cHeaderValue)
+	pactffi_verifier_add_custom_header(v.handle, name, value)
 }
 
 // AddFileSource adds a single Pact file as a source to verify.
 func (v *Verifier) AddFileSource(file string) {
-	cFile := C.CString(file)
-	defer free(cFile)
-
-	C.pactffi_verifier_add_file_source(v.handle, cFile)
+	pactffi_verifier_add_file_source(v.handle, file)
 }
 
 // AddDirectorySource adds a directory as a source to verify: every pact
 // file in it that matches the provider name is verified.
 func (v *Verifier) AddDirectorySource(directory string) {
-	cDirectory := C.CString(directory)
-	defer free(cDirectory)
-
-	C.pactffi_verifier_add_directory_source(v.handle, cDirectory)
+	pactffi_verifier_add_directory_source(v.handle, directory)
 }
 
 // AddURLSource adds a URL as a source to verify: the pact file is fetched
 // from url, using basic auth if username and password are set, or bearer
 // token auth if token is set.
 func (v *Verifier) AddURLSource(url string, username string, password string, token string) {
-	cURL := C.CString(url)
-	defer free(cURL)
-	cUsername := C.CString(username)
-	defer free(cUsername)
-	cPassword := C.CString(password)
-	defer free(cPassword)
-	cToken := C.CString(token)
-	defer free(cToken)
-
-	C.pactffi_verifier_url_source(v.handle, cURL, cUsername, cPassword, cToken)
+	pactffi_verifier_url_source(v.handle, url, username, password, token)
 }
 
 // BrokerSourceWithSelectors adds a Pact Broker as a source to verify,
@@ -184,42 +128,24 @@ func (v *Verifier) AddURLSource(url string, username string, password string, to
 // https://docs.pact.io/pact_broker/advanced_topics/consumer_version_selectors/).
 // Authentication follows the same rules as AddURLSource.
 func (v *Verifier) BrokerSourceWithSelectors(url string, username string, password string, token string, enablePending bool, includeWipPactsSince string, providerTags []string, providerBranch string, selectors []string, consumerVersionTags []string) {
-	cURL := C.CString(url)
-	defer free(cURL)
-	cUsername := C.CString(username)
-	defer free(cUsername)
-	cPassword := C.CString(password)
-	defer free(cPassword)
-	cToken := C.CString(token)
-	defer free(cToken)
-	cIncludeWipPactsSince := C.CString(includeWipPactsSince)
-	defer free(cIncludeWipPactsSince)
-	cProviderBranch := C.CString(providerBranch)
-	defer free(cProviderBranch)
-	cProviderTags, freeProviderTags := stringArrayToCStringArray(providerTags)
+	cProviderTags, freeProviderTags := cStringArray(providerTags)
 	defer freeProviderTags()
-	cSelectors, freeSelectors := stringArrayToCStringArray(selectors)
+	cSelectors, freeSelectors := cStringArray(selectors)
 	defer freeSelectors()
-	cConsumerVersionTags, freeConsumerVersionTags := stringArrayToCStringArray(consumerVersionTags)
+	cConsumerVersionTags, freeConsumerVersionTags := cStringArray(consumerVersionTags)
 	defer freeConsumerVersionTags()
 
-	C.pactffi_verifier_broker_source_with_selectors(v.handle, cURL, cUsername, cPassword, cToken, boolToCUchar(enablePending), cIncludeWipPactsSince, cProviderTags, C.ushort(len(providerTags)), cProviderBranch, cSelectors, C.ushort(len(selectors)), cConsumerVersionTags, C.ushort(len(consumerVersionTags)))
+	pactffi_verifier_broker_source_with_selectors(v.handle, url, username, password, token, boolToCUchar(enablePending), includeWipPactsSince, cProviderTags, uint16(len(providerTags)), providerBranch, cSelectors, uint16(len(selectors)), cConsumerVersionTags, uint16(len(consumerVersionTags)))
 }
 
 // SetPublishOptions sets the values needed to publish verification
 // results back to the Pact Broker: providerVersion is required, the rest
 // are optional and pass as "" or nil to omit.
 func (v *Verifier) SetPublishOptions(providerVersion string, buildURL string, providerTags []string, providerBranch string) {
-	cProviderVersion := C.CString(providerVersion)
-	defer free(cProviderVersion)
-	cBuildURL := C.CString(buildURL)
-	defer free(cBuildURL)
-	cProviderBranch := C.CString(providerBranch)
-	defer free(cProviderBranch)
-	cProviderTags, freeProviderTags := stringArrayToCStringArray(providerTags)
+	cProviderTags, freeProviderTags := cStringArray(providerTags)
 	defer freeProviderTags()
 
-	C.pactffi_verifier_set_publish_options(v.handle, cProviderVersion, cBuildURL, cProviderTags, C.ushort(len(providerTags)), cProviderBranch)
+	pactffi_verifier_set_publish_options(v.handle, providerVersion, buildURL, cProviderTags, uint16(len(providerTags)), providerBranch)
 }
 
 // Execute runs the verification against every source and option
@@ -227,7 +153,7 @@ func (v *Verifier) SetPublishOptions(providerVersion string, buildURL string, pr
 // not run.
 func (v *Verifier) Execute() error {
 	// TODO: Validate
-	result := C.pactffi_verifier_execute(v.handle)
+	result := pactffi_verifier_execute(v.handle)
 
 	/// | Error | Description |
 	/// |-------|-------------|
@@ -249,25 +175,25 @@ func (v *Verifier) Execute() error {
 // SetNoPactsIsError controls whether finding no pacts to verify is
 // treated as a verification error.
 func (v *Verifier) SetNoPactsIsError(isError bool) {
-	C.pactffi_verifier_set_no_pacts_is_error(v.handle, boolToCUchar(isError))
+	pactffi_verifier_set_no_pacts_is_error(v.handle, boolToCUchar(isError))
 }
 
 // SetColoredOutput enables or disables ANSI colour codes in the verifier
 // output; colour is enabled by default.
 func (v *Verifier) SetColoredOutput(isColoredOutput bool) {
-	C.pactffi_verifier_set_coloured_output(v.handle, boolToCUchar(isColoredOutput))
+	pactffi_verifier_set_coloured_output(v.handle, boolToCUchar(isColoredOutput))
 }
 
 // resultJSON returns the verification result of the last Execute as JSON,
 // or "" if the FFI could not produce it.
 func (v *Verifier) resultJSON() string {
-	cJSON := C.pactffi_verifier_json(v.handle)
+	cJSON := pactffi_verifier_json(v.handle)
 	if cJSON == nil {
 		return ""
 	}
 	defer libRustFree(cJSON)
 
-	return C.GoString(cJSON)
+	return goString(cJSON)
 }
 
 // verificationResult is the part of the pactffi_verifier_json document
@@ -309,29 +235,9 @@ func classifyVerifierFailure(resultJSON string) error {
 	return ErrVerifierFailed
 }
 
-func stringArrayToCStringArray(inputs []string) (**C.char, func()) {
-	if len(inputs) == 0 {
-		return nil, func() {}
-	}
-
-	output := make([]*C.char, len(inputs))
-
-	for i, consumer := range inputs {
-		output[i] = C.CString(consumer)
-	}
-
-	freeOutput := func() {
-		for _, consumer := range output {
-			free(consumer)
-		}
-	}
-
-	return (**C.char)(unsafe.Pointer(&output[0])), freeOutput
-}
-
-func boolToCUchar(val bool) C.uchar {
+func boolToCUchar(val bool) uint8 {
 	if val {
-		return C.uchar(1)
+		return 1
 	}
-	return C.uchar(0)
+	return 0
 }

@@ -133,6 +133,15 @@ linters:
         linters:
           - revive
         text: "var-naming"
+      # internal/native is the FFI boundary: handing pointers to pact_ffi (G103)
+      # and narrowing Go ints to the fixed-width C types in its signatures
+      # (G115) is what the package is for. cgo's C.int(x) conversions hid the
+      # same narrowing from gosec; the backend-neutral call sites spell it in
+      # Go types. Scoped to these two rules, and to this package.
+      - path: internal/native/
+        linters:
+          - gosec
+        text: "G103|G115"
       # internal/native's switch statements match pact_ffi's C return codes,
       # each documented in a comment table directly above the switch; the
       # numbers are FFI enum values, not tunable magic numbers. Scoped to
